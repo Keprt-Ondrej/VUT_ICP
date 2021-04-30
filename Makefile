@@ -1,57 +1,23 @@
-# Paths to source files
-INC_PATH = ./src/include/
-OBJ_PATH = ./src/obj/
-SRC_PATH = ./src/src/
 
-# Name of created executable
+
 PROJECT = mqttexp
+ZIP = n-xfabom01-xkeprt03.zip
+SRC=src/
 
-# Names of files to compile (without extensions)
-FILES = explorer gui
+build: clean
+	qmake $(SRC)src.pro -o $(SRC)Makefile
+	$(MAKE) -C $(SRC)
+	mv $(SRC)$(PROJECT) $(PROJECT)
 
-# Name of compressed archive
-COMPRESS = 1-xfabom01-xkeprt03.zip
-
-
-
-#===========================================================================
-LC_ALL = en_EN.utf8W
-CFLAGS = -g -std=c++17 -O2 -pedantic -Wall -Wextra -I$(INC_PATH)
-CPP = g++ $(CFLAGS) -o $@
-
-OBJ_FILES = $(patsubst %, $(OBJ_PATH)%.o, $(FILES))
-
-# Build only
-build: $(PROJECT)
-
-# Build & run
 run: build
 	./$(PROJECT)
 
-# Create html documentation from source code
-doxygen:
-	doxygen
-
-# Compresses needed files for compilation
-pack: clean clean_doc
-	zip -r $(COMPRESS) src examples doc Makefile Doxyfile README.txt
-
-# Removes all object files
 clean:
-	rm -f $(OBJ_PATH)* $(PROJECT)
+	rm -r -f icp $(SRC)*.o $(SRC)Makefile $(SRC)src $(SRC)moc_* $(SRC)ui_mainwindow.h doc/*
+	
+pack: clean
+	zip -r $(ZIP) $(SRC) examples/ doc/ Makefile README.*
 
-# Removes generated documentation
-clean_doc:
-	rm -r -f doc/*
-
-# Create executable application
-$(PROJECT): $(OBJ_FILES) $(OBJ_PATH)main.o
-	$(CPP) $^
-
-# Build main file
-$(OBJ_PATH)main.o: $(SRC_PATH)main.cpp
-	$(CPP) -c $<
-
-# Build individual object files
-$(OBJ_PATH)%.o: $(SRC_PATH)%.cpp $(INC_PATH)%.h
-	$(CPP) -c $<
+doxygen:
+	doxygen doc/Doxyfile
+	
