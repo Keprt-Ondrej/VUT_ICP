@@ -10,7 +10,7 @@ PROJECT = mqttexp
 FILES = explorer gui
 
 # Name of compressed archive
-COMPRESS = n-xfabom01-xkeprt03.zip
+COMPRESS = 1-xfabom01-xkeprt03.zip
 
 
 
@@ -34,11 +34,11 @@ doxygen:
 
 # Compresses needed files for compilation
 pack: clean clean_doc
-	zip -r $(COMPRESS) src examples doc Makefile
+	zip -r $(COMPRESS) src examples doc Makefile Doxyfile README.txt
 
 # Removes all object files
 clean:
-	rm -f $(OBJ_PATH)*
+	rm -f $(OBJ_PATH)* $(PROJECT)
 
 # Removes generated documentation
 clean_doc:
