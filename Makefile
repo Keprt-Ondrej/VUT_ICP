@@ -1,10 +1,10 @@
 
 
 PROJECT = mqttexp
-ZIP = n-xfabom01-xkeprt03.zip
+ZIP = 1-xfabom01-xkeprt03.zip
 SRC=src/
 
-build: clean
+build:
 	qmake $(SRC)src.pro -o $(SRC)Makefile
 	$(MAKE) -C $(SRC)
 	mv $(SRC)$(PROJECT) $(PROJECT)
@@ -13,10 +13,10 @@ run: build
 	./$(PROJECT)
 
 clean:
-	rm -r -f icp $(SRC)*.o $(SRC)Makefile $(SRC)src $(SRC)moc_* $(SRC)ui_mainwindow.h doc/*
+	rm -r -f $(SRC)*.o $(SRC)Makefile $(SRC)moc_* $(SRC)ui_mainwindow.h doc/* $(PROJECT)
 	
 pack: clean
-	zip -r $(ZIP) $(SRC) examples/ doc/ Makefile README.*
+	zip -r $(ZIP) $(SRC) examples/ doc/ Makefile README.txt Doxyfile
 
 doxygen:
 	doxygen doc/Doxyfile
