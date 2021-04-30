@@ -30,7 +30,7 @@ run: build
 
 # Create html documentation from source code
 doxygen:
-	@echo "Please for all that is holy, fix me!" > doc/hi
+	doxygen
 
 # Compresses needed files for compilation
 pack: clean clean_doc
