@@ -1,12 +1,58 @@
-#include <iostream>
-#include <vector>
 #include "shared.h"
 
-#include "mainwindow.h"
-#include "hello.cpp"
-#include <QApplication>
 
-int main(int argc, char *argv[]) {
+const std::string& Item::get_name(){
+	return name;
+}
+
+type_t Item::get_type(){
+	return type;
+}
+
+
+Shared::~Shared(){
+}
+
+void Shared::cmd_append(cmd_t cmd){
+	command.push_back(cmd);
+}
+
+void Shared::data_out_append(const std::string& data){
+	data_out.push_back(data);
+}
+
+void Shared::data_recv_append(const std::string& data){
+	data_recv.push_back(data);
+}
+
+TypedItem<std::vector<Item*>>* Shared::get_topics(){
+	return &topics;
+}
+
+void tree_print_recursive(Item* item){
+	if(item == NULL) return;
+
+	static std::string path = "";
+
+	if(item->get_type() == TOPIC){
+		TypedItem<std::string>* tmp = static_cast<TypedItem<std::string>*>(item);
+		std::cout << path << tmp->get_name() << " = " << tmp->data << std::endl;
+	}
+	else if(item->get_type() == LEVEL){
+		path += item->get_name() + "/";
+		std::vector<Item*> tmp_list = static_cast<TypedItem<std::vector<Item*>>*>(item)->data;
+		for(size_t i = 0; i < tmp_list.size(); i++){
+			tree_print_recursive(tmp_list[i]);
+		}
+		path.erase(path.end()-item->get_name().length()-1, path.end());
+
+	}
+	else{
+		std::cout << "Unrecognized item " << item->get_name() << std::endl;
+	}
+}
+
+void test() {
 	/* level00
 	 *  | topic0
 	 *  |
@@ -65,20 +111,12 @@ int main(int argc, char *argv[]) {
 
 	level00.data.push_back(&topic6);
 
-	Shared oof(level00);
-	tree_print_recursive(oof.get_topics());
+	Shared a(level00);
+	tree_print_recursive(a.get_topics());
 	std::cout << "==========================\n";
 
 	Shared x;
 	tree_print_recursive(x.get_topics());
 	std::cout << "==========================\n";
-
-
-
-	hi();
-	QApplication a(argc, argv);
-	MainWindow w;
-	w.show();
-
-  	return a.exec();
 }
+
