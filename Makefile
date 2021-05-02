@@ -19,5 +19,5 @@ pack: clean
 	zip -r $(ZIP) $(SRC) examples/ doc/ Makefile README.txt Doxyfile
 
 doxygen:
-	doxygen doc/Doxyfile
+	doxygen 
 	
