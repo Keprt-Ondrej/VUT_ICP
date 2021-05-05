@@ -6,14 +6,82 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>884</width>
-    <height>565</height>
+    <width>831</width>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralWidget"/>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="2" column="5">
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="Scroll">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>401</width>
+         <height>431</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QTextEdit" name="TopicTextView"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="3" column="5">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="TopicShowInNewWindow">
+        <property name="styleSheet">
+         <string notr="true">QPushButton:pressed{
+	background-color: #00FF00;
+}</string>
+        </property>
+        <property name="text">
+         <string>Show in new window</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="TopicEdit">
+        <property name="styleSheet">
+         <string notr="true">QPushButton:pressed{
+	background-color: #00FF00;
+}</string>
+        </property>
+        <property name="text">
+         <string>Edit</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="TopicHistory">
+        <property name="styleSheet">
+         <string notr="true">QPushButton:pressed{
+	background-color: #00FF00;
+}</string>
+        </property>
+        <property name="text">
+         <string>History</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="2" rowspan="4">
+     <widget class="QTreeView" name="TreeView"/>
+    </item>
+   </layout>
+  </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -27,10 +95,19 @@
    </attribute>
    <addaction name="actionConnect_server"/>
    <addaction name="separator"/>
+   <addaction name="actionNew_Topic"/>
   </widget>
   <action name="actionConnect_server">
    <property name="text">
     <string>Connect server</string>
+   </property>
+  </action>
+  <action name="actionNew_Topic">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>New Topic</string>
    </property>
   </action>
  </widget>
