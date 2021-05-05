@@ -47,12 +47,12 @@ class Shared{
 
 	protected:
 
-		std::string protocol;
-		std::string host;
-		int port;
-		std::string username;
-		std::string password;	
-
+		std::string protocol = "mqt:://";
+		std::string host = "test.mosquitto.org";
+		int port = 1883;
+		std::string username = "";
+		std::string password = "";	
+		
 		std::vector<cmd_t> command;
 		std::vector<std::string> data_out;
 		std::vector<std::string> data_recv;
