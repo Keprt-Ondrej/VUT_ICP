@@ -22,6 +22,10 @@ private:
 private slots:
   void connectServerNewWindow();    
   void on_actionConnect_server_triggered();
+  void on_actionNew_Topic_triggered();
+  void on_TopicShowInNewWindow_released();
+  void on_TopicHistory_released();
+  void on_TopicEdit_released();
 };
 
 #endif // MAINWINDOW_H
