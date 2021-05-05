@@ -13,7 +13,7 @@ run: build
 	./$(PROJECT)
 
 clean:
-	rm -r -f $(SRC)*.o $(SRC)Makefile $(SRC)moc_* $(SRC)ui_mainwindow.h doc/* $(PROJECT)
+	rm -r -f $(SRC)*.o $(SRC)Makefile $(SRC)moc_* $(SRC)ui_mainwindow.h doc/* $(PROJECT) src/src.pro.user.*
 	
 pack: clean
 	zip -r $(ZIP) $(SRC) examples/ doc/ Makefile README.txt Doxyfile
