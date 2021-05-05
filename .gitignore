@@ -2,3 +2,11 @@
 doc/*
 *.o
 mqttexp
+build-src-Desktop*
+src/ui_connectserver.h
+src/src.pro.user*
+src/ui_mainwindow.h
+src/moc_predefs.h
+src/moc_mainwindow.cpp
+src/moc_connectserver.cpp
+src/Makefile
