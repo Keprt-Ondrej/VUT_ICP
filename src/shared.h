@@ -43,8 +43,16 @@ class Shared{
 		void data_out_append(const std::string& data);
 		void data_recv_append(const std::string& data);
 		TypedItem<std::vector<Item*>>* get_topics();
+        void setConnectionInfo(std::string protocol,std::string host,int port,std::string username,std::string password);
 
 	protected:
+
+		std::string protocol;
+		std::string host;
+		int port;
+		std::string username;
+		std::string password;	
+
 		std::vector<cmd_t> command;
 		std::vector<std::string> data_out;
 		std::vector<std::string> data_recv;
@@ -53,5 +61,5 @@ class Shared{
 };
 
 void tree_print_recursive(Item* item);
-
+extern Shared *activeShared;
 #endif // SHARED_H

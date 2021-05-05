@@ -25,6 +25,15 @@ void Shared::data_recv_append(const std::string& data){
 	data_recv.push_back(data);
 }
 
+
+void Shared::setConnectionInfo(std::string protocol,std::string host,int port,std::string username,std::string password){
+	this->protocol = protocol;
+	this->host = host;
+	this->port = port;
+	this->username = username;
+	this->password = password;	
+}
+
 TypedItem<std::vector<Item*>>* Shared::get_topics(){
 	return &topics;
 }

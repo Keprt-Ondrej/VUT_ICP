@@ -6,6 +6,8 @@
 #include "hello.cpp"
 #include <QApplication>
 
+Shared *activeShared;
+
 int main(int argc, char *argv[]) {
 	/* level00
 	 *  | topic0
@@ -67,14 +69,15 @@ int main(int argc, char *argv[]) {
 
 	Shared oof(level00);
 	tree_print_recursive(oof.get_topics());
-	std::cout << "==========================\n";
+    std::cout << "==========================\n";
 
 	Shared x;
 	tree_print_recursive(x.get_topics());
-	std::cout << "==========================\n";
+    std::cout << "==========================\n";
 
 
-
+	Shared active(level00);
+	activeShared = &active; //potrebuji nejaky shared navazat jinak SIGSEG
 	hi();
 	QApplication a(argc, argv);
 	MainWindow w;
