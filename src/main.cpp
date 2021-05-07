@@ -3,7 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <unistd.h>
-#include "mqtt_client.h"
+
 #include <thread>
 #include "shared.h"
 #include "hello.cpp"
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
 
 	QApplication a(argc, argv);
 	//connectServerNewWindow();
-	MainWindow w(fiskus);
+	MainWindow w(mqtt);
 	w.show();
 
 	return a.exec();

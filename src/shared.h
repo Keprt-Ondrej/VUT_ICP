@@ -4,6 +4,8 @@
 #include "mainwindow.h"
 #include <iostream>
 #include <vector>
+#include <QtCore>
+#include <QtGui>
 
 enum type_t{LEVEL, TOPIC};
 enum cmd_t{POSLAT, ODEBRAT}; //enum cmd_t{PUBLISH, SUBSCRIBE}; 

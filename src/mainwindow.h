@@ -3,8 +3,9 @@
 
 #include <QMainWindow>
 #include "ui_mainwindow.h"
-#include <QtCore>
-#include <QtGui>
+#include "mqtt_client.h"
+
+class MQTT_Client;
 
 //https://csfieldguide.org.nz/en/interactives/rgb-mixer/ TODO color setup
 
@@ -20,13 +21,13 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
 public:
-  explicit MainWindow(std::vector<int> &karel,QWidget *parent = 0);
+  explicit MainWindow(MQTT_Client &mqtt,QWidget *parent = 0);
   ~MainWindow();
 
 public:  
   Ui::MainWindow *ui;
   QModelIndex &displayedData;
-  std::vector<int> & my_karel;  //TODO change to shared
+  MQTT_Client &sharedMqtt;  
 
 private slots: 
   void connectServerNewWindow();
