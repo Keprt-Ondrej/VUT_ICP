@@ -21,10 +21,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-        hello.cpp
+        shared.cpp \
+        tcp_client.cpp \
+        mqtt_client.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+        shared.h \
+        tcp_client.h \
+        mqtt_client.h
 
 FORMS += \
         mainwindow.ui
