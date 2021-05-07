@@ -25,7 +25,6 @@ SOURCES += \
         shared.cpp \
         tcp_client.cpp \
         mqtt_client.cpp \
-        hello.cpp \
         topichistory.cpp    
 
 HEADERS += \
