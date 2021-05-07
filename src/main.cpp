@@ -28,9 +28,6 @@ void thread_test(MQTT_Client& client){
 Shared *activeShared;
 int main(int argc, char *argv[]) {
   
-  
-  
-  
 	std::cout << "\nExpecting CONNACK(2)\n";
 	MQTT_Client mqtt("127.0.0.1", 6969);
 	if(mqtt.mqtt_recv(5)){
@@ -69,8 +66,7 @@ int main(int argc, char *argv[]) {
 	mqtt.broker_disconnect();
 	recv_thrd.join();
 
-  
-  	/* level00
+  /* level00
 	 *  | topic0
 	 *  |
 	 *  + level10
@@ -104,7 +100,30 @@ int main(int argc, char *argv[]) {
 	std::vector<Item*> lvl10;
 	std::vector<Item*> lvl11;
 	std::vector<Item*> lvl20;
-  
+
+	lvl20.push_back(&topic4);
+	TypedItem level20("level2", LEVEL, lvl20);
+
+	lvl11.push_back(&level20);
+	lvl11.push_back(&topic5);
+	TypedItem level11("other_level1", LEVEL, lvl11);
+
+	lvl10.push_back(&topic2);
+	lvl10.push_back(&topic3);
+	TypedItem level10("level1", LEVEL, lvl10);
+
+	main_v.push_back(&topic0);
+	main_v.push_back(&level10);
+	main_v.push_back(&level11);
+	main_v.push_back(&topic1);
+	TypedItem level00("", LEVEL, main_v);
+
+	std::cout << "==========================\n";
+	tree_print_recursive(&level00);
+	std::cout << "==========================\n";
+
+	level00.data.push_back(&topic6);
+
 	Shared oof(level00);
 	tree_print_recursive(oof.get_topics());
     std::cout << "==========================\n";
@@ -120,7 +139,6 @@ int main(int argc, char *argv[]) {
 
     QVariant x2 = x1;
 
-
 	
 	QList<QVariant> karel = x2.toList();
 	karel.push_front((double)73);
@@ -131,6 +149,7 @@ int main(int argc, char *argv[]) {
     for(int i=0; i<x3.size(); i++){
         std::cout << x3.at(i).toDouble() << "\n";
 	}
+
   
   Shared active(level00);
 	activeShared = &active; //potrebuji nejaky shared navazat jinak SIGSEG

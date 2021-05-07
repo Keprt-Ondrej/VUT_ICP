@@ -6,7 +6,7 @@
 #include <vector>
 
 enum type_t{LEVEL, TOPIC};
-enum cmd_t{PUBLISH, SUBSCRIBE}; 
+enum cmd_t{POSLAT, ODEBRAT}; //enum cmd_t{PUBLISH, SUBSCRIBE}; 
 enum data_type_t{JSON,STRING,BIN};
 
 /*
