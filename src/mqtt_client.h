@@ -42,10 +42,10 @@ typedef struct PublishFlags{
 class MQTT_Client : private TCP_Client{
 	public:
 		MQTT_Client();
-		MQTT_Client(client_t& info);
+		MQTT_Client(client_t info);
 		~MQTT_Client();
 		
-		int broker_connect(client_t& info);
+		int broker_connect(client_t info);
 		int broker_disconnect();
 		int publish(const std::string& topic, const std::string& value, pubflg_t opt={0,0,0});
 		int subscribe(const std::string& topic);
