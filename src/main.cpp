@@ -27,7 +27,7 @@ void thread_test(MQTT_Client& client){
 
 Shared *activeShared;
 int main(int argc, char *argv[]) {
-  
+/*
 	std::cout << "\nExpecting CONNACK(2)\n";
 	MQTT_Client mqtt("127.0.0.1", 6969);
 	if(mqtt.mqtt_recv(5)){
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
 	usleep(500000);
 	mqtt.broker_disconnect();
 	recv_thrd.join();
-
+*/
   /* level00
 	 *  | topic0
 	 *  |
@@ -118,20 +118,23 @@ int main(int argc, char *argv[]) {
 	main_v.push_back(&topic1);
 	TypedItem level00("", LEVEL, main_v);
 
+/*
 	std::cout << "==========================\n";
 	tree_print_recursive(&level00);
 	std::cout << "==========================\n";
-
+*/
 	level00.data.push_back(&topic6);
 
 	Shared oof(level00);
+/*
 	tree_print_recursive(oof.get_topics());
     std::cout << "==========================\n";
-
+*/
 	Shared x;
+/*
 	tree_print_recursive(x.get_topics());
     std::cout << "==========================\n";
-	
+*/	
 	QList<QVariant> x1;
     for(int i=0; i<5; i++){
 		x1.append((double)i);
@@ -147,16 +150,21 @@ int main(int argc, char *argv[]) {
      
     QList<QVariant> x3 = x2.toList();
     for(int i=0; i<x3.size(); i++){
-        std::cout << x3.at(i).toDouble() << "\n";
+        //std::cout << x3.at(i).toDouble() << "\n";
 	}
 
   
-  Shared active(level00);
+  	Shared active(level00);
 	activeShared = &active; //potrebuji nejaky shared navazat jinak SIGSEG
-	hi();
-		
+//	hi();
+	
+	std::vector<int> fiskus;
+	fiskus.push_back(5);
+	fiskus.push_back(42);
+
 	QApplication a(argc, argv);
-	MainWindow w;
+	//connectServerNewWindow();
+	MainWindow w(fiskus);
 	w.show();
 
 	return a.exec();

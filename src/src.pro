@@ -25,16 +25,19 @@ SOURCES += \
         shared.cpp \
         tcp_client.cpp \
         mqtt_client.cpp \
-        hello.cpp \       
+        hello.cpp \
+        topichistory.cpp    
 
 HEADERS += \
         connectserver.h \        
         shared.h  \
         mainwindow.h \      
         tcp_client.h \
-        mqtt_client.h
+        mqtt_client.h \
+        topichistory.h
 
 
 FORMS += \
         connectserver.ui \
-        mainwindow.ui
+        mainwindow.ui \
+        topichistory.ui

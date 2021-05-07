@@ -7,7 +7,7 @@
 #include <QtGui>
 
 //https://csfieldguide.org.nz/en/interactives/rgb-mixer/ TODO color setup
-extern QTreeView* displayedTree;
+
 const QColor receivedColor = QColor(250,0,0);
 const QColor sendColor = QColor(0,200,0);
 
@@ -20,21 +20,23 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
 public:
-  explicit MainWindow(QWidget *parent = 0);
+  explicit MainWindow(std::vector<int> &karel,QWidget *parent = 0);
   ~MainWindow();
 
-public:
+public:  
   Ui::MainWindow *ui;
+  QModelIndex &displayedData;
+  std::vector<int> & my_karel;  //TODO change to shared
 
-private slots:
-  void connectServerNewWindow();    
+private slots: 
+  void connectServerNewWindow();
   void on_actionConnect_server_triggered();
   void on_actionNew_Topic_triggered();
   void on_TopicShowInNewWindow_released();
   void on_TopicHistory_released();
   void on_TopicEdit_released();
-  void on_TreeView_expanded(const QModelIndex &index);
   void on_TreeView_doubleClicked(const QModelIndex &index);
 };
+
 
 #endif // MAINWINDOW_H
