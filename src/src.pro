@@ -19,17 +19,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+        connectserver.cpp \
         main.cpp \
         mainwindow.cpp \
         shared.cpp \
         tcp_client.cpp \
-        mqtt_client.cpp
+        mqtt_client.cpp \
+        hello.cpp \       
 
 HEADERS += \
-        mainwindow.h \
-        shared.h \
+        connectserver.h \        
+        shared.h  \
+        mainwindow.h \      
         tcp_client.h \
         mqtt_client.h
 
+
 FORMS += \
+        connectserver.ui \
         mainwindow.ui
