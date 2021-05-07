@@ -22,13 +22,18 @@ SOURCES += \
         connectserver.cpp \
         main.cpp \
         mainwindow.cpp \
-        hello.cpp \ 
-        shared.cpp
+        shared.cpp \
+        tcp_client.cpp \
+        mqtt_client.cpp \
+        hello.cpp \       
 
 HEADERS += \
-        connectserver.h \
-        mainwindow.h \
-        shared.h
+        connectserver.h \        
+        shared.h  \
+        mainwindow.h \      
+        tcp_client.h \
+        mqtt_client.h
+
 
 FORMS += \
         connectserver.ui \
