@@ -31,7 +31,7 @@
        </property>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
-         <widget class="QTextEdit" name="TopicTextView"/>
+         <widget class="QTextBrowser" name="TopicTextView"/>
         </item>
        </layout>
       </widget>
@@ -78,7 +78,14 @@
      </layout>
     </item>
     <item row="0" column="2" rowspan="4">
-     <widget class="QTreeView" name="TreeView"/>
+     <widget class="QTreeView" name="TreeView">
+      <property name="editTriggers">
+       <set>QAbstractItemView::EditKeyPressed</set>
+      </property>
+      <attribute name="headerVisible">
+       <bool>false</bool>
+      </attribute>
+     </widget>
     </item>
    </layout>
   </widget>

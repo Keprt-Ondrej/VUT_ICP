@@ -1,11 +1,24 @@
 #ifndef SHARED_H
 #define SHARED_H
 
+#include "mainwindow.h"
 #include <iostream>
 #include <vector>
 
 enum type_t{LEVEL, TOPIC};
-enum cmd_t{PUBLISH, SUBSCRIBE};
+enum cmd_t{PUBLISH, SUBSCRIBE}; 
+enum data_type_t{JSON,STRING,BIN};
+
+/*
+ * QStandardItem:
+ * vsechny datove polozky jsou typu QVariant
+ * data[0] = topic name
+ * data[3] = bool data nebo topic/level
+ * data[4] = zdroj 
+ * data[5] = data_type_t
+ * data[6] = QList<QVariant> data
+ * data[7] = fullpath
+*/
 
 class Item{
 	public:
@@ -44,15 +57,16 @@ class Shared{
 		void data_recv_append(const std::string& data);
 		TypedItem<std::vector<Item*>>* get_topics();
         void setConnectionInfo(std::string protocol,std::string host,int port,std::string username,std::string password);
-
+		void modelSetup();
+		void insertTopic(std::string path,bool received,data_type_t dataType,QVariant data);
 	protected:
-
+		QStandardItemModel* dataModel;
 		std::string protocol = "mqt:://";
 		std::string host = "test.mosquitto.org";
 		int port = 1883;
 		std::string username = "";
 		std::string password = "";	
-		
+	
 		std::vector<cmd_t> command;
 		std::vector<std::string> data_out;
 		std::vector<std::string> data_recv;

@@ -1,5 +1,20 @@
 #include "shared.h"
+#include "mainwindow.h"
 
+std::pair<std::string,std::string> getPath(std::string path){    
+    std::string delimiter = "/";
+    std::string name = path.substr(0, path.find(delimiter)); // name is "scott"
+    path.erase(0, path.find(delimiter) + delimiter.length());
+    return std::make_pair(name, path);
+}
+
+void Shared::modelSetup(){
+	dataModel = new QStandardItemModel();
+}
+
+void Shared::insertTopic(std::string path,bool received,data_type_t dataType,QVariant data){
+	return;
+}
 
 const std::string& Item::get_name(){
 	return name;

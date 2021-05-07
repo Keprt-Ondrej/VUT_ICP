@@ -1,14 +1,13 @@
-#include <iostream>
-#include <vector>
 #include "shared.h"
 
-#include "mainwindow.h"
 #include "hello.cpp"
 #include <QApplication>
+#include "mainwindow.h"
+#include "connectserver.h"
 
 Shared *activeShared;
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) { 
 	/* level00
 	 *  | topic0
 	 *  |
@@ -74,11 +73,30 @@ int main(int argc, char *argv[]) {
 	Shared x;
 	tree_print_recursive(x.get_topics());
     std::cout << "==========================\n";
+	
+	QList<QVariant> x1;
+    for(int i=0; i<5; i++){
+		x1.append((double)i);
+	}
+
+    QVariant x2 = x1;
+
+	
+	QList<QVariant> karel = x2.toList();
+	karel.push_front((double)73);
+	x2 = karel;
+	
+     
+    QList<QVariant> x3 = x2.toList();
+    for(int i=0; i<x3.size(); i++){
+        std::cout << x3.at(i).toDouble() << "\n";
+	}
 
 
 	Shared active(level00);
 	activeShared = &active; //potrebuji nejaky shared navazat jinak SIGSEG
 	hi();
+		
 	QApplication a(argc, argv);
 	MainWindow w;
 	w.show();

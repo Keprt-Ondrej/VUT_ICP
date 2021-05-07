@@ -18,7 +18,6 @@ ConnectServer::~ConnectServer()
 }
 
 void ConnectServer::storeConnectionInfo(){
-
     QString protocolQS = ui->Protocol->currentText();
     std::string protocol = protocolQS.toUtf8().constData();
     QString hostQS = ui->Host->text();    

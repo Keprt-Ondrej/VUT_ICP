@@ -3,6 +3,13 @@
 
 #include <QMainWindow>
 #include "ui_mainwindow.h"
+#include <QtCore>
+#include <QtGui>
+
+//https://csfieldguide.org.nz/en/interactives/rgb-mixer/ TODO color setup
+extern QTreeView* displayedTree;
+const QColor receivedColor = QColor(250,0,0);
+const QColor sendColor = QColor(0,200,0);
 
 namespace Ui {
   class MainWindow;
@@ -16,7 +23,7 @@ public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
 
-private:
+public:
   Ui::MainWindow *ui;
 
 private slots:
@@ -26,6 +33,8 @@ private slots:
   void on_TopicShowInNewWindow_released();
   void on_TopicHistory_released();
   void on_TopicEdit_released();
+  void on_TreeView_expanded(const QModelIndex &index);
+  void on_TreeView_doubleClicked(const QModelIndex &index);
 };
 
 #endif // MAINWINDOW_H
