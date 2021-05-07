@@ -227,10 +227,9 @@ int MQTT_Client::ping(){
 }
 
 int MQTT_Client::mqtt_recv(int timeout){
-	if(!connected) return 0;
-
 	/// Acquire incoming packet
 	int tcp_socket = get_socket();
+	if(tcp_socket < 0) return -1;
 	fd_set read_socket;
 	struct timeval timer = {timeout, 0};
 	unsigned char c;
@@ -242,7 +241,7 @@ int MQTT_Client::mqtt_recv(int timeout){
 
 	/// Set up timeout in case the server doesnt respond
 	int retval = select(tcp_socket+1, &read_socket, NULL, NULL, &timer);
-	if(retval < 0) return -1;       // Error
+	if(retval < 0) return retval-10;       // Error
 	else if(retval == 0) return -2; // Timeout
 
 	/// Set nonblocking reading
