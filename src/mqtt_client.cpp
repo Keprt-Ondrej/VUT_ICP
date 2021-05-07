@@ -20,30 +20,14 @@
 
 // REWORK change to ClientInfo
 MQTT_Client::MQTT_Client()
+: connected(false){}
+
+MQTT_Client::MQTT_Client(client_t& info)
 : connected(false){
-	unique_client_id();
-}
-
-MQTT_Client::MQTT_Client(const std::string& custom_id)
-: client_id(custom_id), connected(false){}
-
-MQTT_Client::MQTT_Client(const std::string& ip_address, int port)
-: connected(false){
-	unique_client_id();
-	int retval = broker_connect(ip_address, port);
+	int retval = broker_connect(info);
 	if(retval){
-		std::cerr << "Unable to connect to " << ip_address << ":" << port << " broker.\n";
+		std::cerr << "Unable to connect to " << client.hostname << ":" << client.port << " broker.\n";
 	}
-	else connected = true;
-}
-
-MQTT_Client::MQTT_Client(const std::string& custom_id, const std::string& ip_address, int port)
-: client_id(custom_id), connected(false){
-	int retval = broker_connect(ip_address, port);
-	if(retval){
-		std::cerr << "Unable to connect to " << ip_address << ":" << port << " broker.\n";
-	}
-	else connected = true;
 }
 
 MQTT_Client::~MQTT_Client(){
@@ -51,13 +35,21 @@ MQTT_Client::~MQTT_Client(){
 	if(retval) std::cerr << "Broker already disconnected : " << retval << std::endl;
 }
 
-int MQTT_Client::broker_connect(const std::string& ip_address, int port){
+int MQTT_Client::broker_connect(client_t& info){
+	/// Disconnect from prevoius session if there has been one
+	broker_disconnect();
+
+	/// Store the data
+	client = info;
+	if(client.client_id == "")
+		unique_client_id();
+
 	/// Connect to an MQTT broker
-	int retval = tcp_connect(ip_address, port);
+	int retval = tcp_connect(client.hostname, client.port);
 	if(retval) return retval;
 
 	/// Create CONNECT packet
-	uint32_t remaining_length = to_remaining_len(12 + client_id.length()); // 10 bytes are static + 2 bytes for payload length
+	uint32_t remaining_length = to_remaining_len(12 + client.client_id.length()); // 10 bytes are static + 2 bytes for payload length
 	std::string connect_packet;
 
 	/// Fixed header - Packet type and remaining length
@@ -65,25 +57,25 @@ int MQTT_Client::broker_connect(const std::string& ip_address, int port){
 	INSERT_REM_LEN(remaining_length, connect_packet);
 
 	/// Variable header
+	//REWORK connect flags
 	connect_packet += static_cast<char>(0);    // Static 2 byte length of 'MQTT' - protocol name
 	connect_packet += static_cast<char>(4);
 	connect_packet += "MQTT";                  // Protocol name
 	connect_packet += static_cast<char>(4);    // Protocol version (4 = version 3.11 for some reason)
 	connect_packet += static_cast<char>(0x02); // Connect flags, only clean session is set
-	connect_packet += static_cast<char>(0);    // 2 Byte keep alive value
-	connect_packet += static_cast<char>(60);
+	INSERT_2B_LEN(60, connect_packet);         // 2 Byte keep alive value
 
 	/// Payload - client ID
-	INSERT_2B_LEN(client_id.length(), connect_packet);
-	connect_packet += client_id;
+	INSERT_2B_LEN(client.client_id.length(), connect_packet);
+	connect_packet += client.client_id;
 
 
 	/// Send the packet
 	retval = tcp_send(connect_packet.c_str(), connect_packet.length());
-	if(retval) return -11;
+	if(retval) return retval-10;
 
 	/// Expect CONNACK to arrive
-	add_ack(CONNACK);
+	add_ack(std::make_tuple(CONNACK, 0));
 
 	connected = true;
 
@@ -102,30 +94,30 @@ int MQTT_Client::broker_disconnect(){
 	return 0;
 }
 
-int MQTT_Client::publish(const std::string& topic, const std::string& value, int QoS, bool retain){
+int MQTT_Client::publish(const std::string& topic, const std::string& value, pubflg_t opt){
 	// REWORK change to PublishFlags
-	if(topic.length() == 0 || topic.length() > 0xFFFF || value.length() > 0xFFFF || QoS < 0 || QoS >= 3)
+	if(topic.length() == 0 || topic.length() > 0xFFFF || value.length() > 0xFFFF || opt.QoS >= 3)
 		return -1;
 
 	/// Create PUBLISH packet
 	uint32_t remaining_length = 0;
 	std::string publish_packet;
 
-	if(QoS != 0) remaining_length = to_remaining_len(6+topic.length()+value.length()); // 2+2+2 bytes for topic, packet identifier and payload lengths + the actual data
-	else         remaining_length = to_remaining_len(4+topic.length()+value.length()); // Same as ^ , but no packet identifier
+	if(opt.QoS != 0) remaining_length = to_remaining_len(6+topic.length()+value.length()); // 2+2+2 bytes for topic, packet identifier and payload lengths + the actual data
+	else             remaining_length = to_remaining_len(4+topic.length()+value.length()); // Same as ^ , but no packet identifier
 
 	/// Create fixed header
-	// REWORK add DUP flag (if this packet has been already sent)
-	if(QoS != 0) publish_packet = static_cast<char>((PUBLISH << 4) | (0 << 3) | (QoS << 1) | (retain&1));
-	else         publish_packet = static_cast<char>((PUBLISH << 4) | (0 << 3) | (0 << 1) | (retain&1));
+	publish_packet = static_cast<char>((PUBLISH << 4) | (opt.DUP << 3) | ((opt.QoS&0b11) << 1) | (opt.retain&1));
 	INSERT_REM_LEN(remaining_length, publish_packet);
 
 	/// Create variable header
 	INSERT_2B_LEN(topic.length(), publish_packet);
 	publish_packet += topic;
 
-	if(QoS > 0){
-		// REWORK add packet id
+	uint16_t packet_id = 0;
+	if(opt.QoS > 0){
+		packet_id = available_packet_id();
+		INSERT_2B_LEN(packet_id, publish_packet);
 	}
 
 	/// Create payload
@@ -137,8 +129,8 @@ int MQTT_Client::publish(const std::string& topic, const std::string& value, int
 	if(retval) return retval-10;
 
 	/// Expect publish acknowledgement to arrive
-	if(QoS == 1)      add_ack(PUBACK);
-	else if(QoS == 2) add_ack(PUBREC);
+	if(opt.QoS == 1)      add_ack(std::make_tuple(PUBACK, packet_id));
+	else if(opt.QoS == 2) add_ack(std::make_tuple(PUBREC, packet_id));
 
 	return 0;
 }
@@ -167,7 +159,7 @@ int MQTT_Client::subscribe(const std::string& topic){
 	if(retval) return retval;
 
 	/// Expect SUBACK to arrive
-	add_ack(SUBACK);
+	add_ack(std::make_tuple(SUBACK, 0));
 
 	return 0;
 }
@@ -194,7 +186,7 @@ int MQTT_Client::unsubscribe(const std::string& topic){
 	if(retval) return retval;
 
 	/// Expect UNSUBACK to arrive
-	add_ack(UNSUBACK);
+	add_ack(std::make_tuple(UNSUBACK, 0));
 
 	return 0;
 }
@@ -206,12 +198,14 @@ int MQTT_Client::ping(){
 	if(retval) return retval;
 
 	/// Expect PINGRESP to arrive
-	add_ack(PINGRESP);
+	add_ack(std::make_tuple(PINGRESP, 0));
 
 	return 0;
 }
 
 int MQTT_Client::mqtt_recv(int timeout){
+	if(!connected) return 0;
+
 	/// Acquire incoming packet
 	int tcp_socket = get_socket();
 	fd_set read_socket;
@@ -308,13 +302,13 @@ void MQTT_Client::unique_client_id(){
 
 
 	/// Set client ID
-	client_id = "ICP_mqtt_explorer_";
-	client_id += hex_id;
+	client.client_id = "ICP_mqtt_explorer_";
+	client.client_id += hex_id;
 
 	//std::cout << client_id << " " << client_id.length() << std::endl;
 }
 
-int MQTT_Client::available_packet_id(){
+uint16_t MQTT_Client::available_packet_id(){
 	if(unavailable_packet_id.empty()){
 		unavailable_packet_id.push_back(1);
 		return 1;
@@ -326,17 +320,31 @@ int MQTT_Client::available_packet_id(){
 	}
 }
 
-void MQTT_Client::add_ack(PacketType ack){
+void MQTT_Client::add_ack(std::tuple<PacketType, uint16_t> ack){
 	pending_ack.push_back(ack);
 	std::cout << pending_ack.size() << std::endl;
 }
 
-int MQTT_Client::rm_ack(PacketType ack){
+int MQTT_Client::rm_ack(std::tuple<PacketType, uint16_t> ack){
 	if(*pending_ack.begin() == ack){
 		pending_ack.erase(pending_ack.begin());
 		std::cout << pending_ack.size();
+		rm_packet_id(std::get<1>(ack));
 	}
-	else return -1;
+	else{
+		std::cerr << "Expecting: " << std::get<0>(*pending_ack.begin()) << std::endl;
+		return -1;
+	}
+	return 0;
+}
+
+int MQTT_Client::rm_packet_id(uint16_t packet_id){
+	for(unsigned int i = 0; i < unavailable_packet_id.size(); i++){
+		if(unavailable_packet_id[i] == packet_id){
+			unavailable_packet_id.erase(unavailable_packet_id.begin() + i);
+			break;
+		}
+	}
 	return 0;
 }
 
@@ -344,9 +352,10 @@ int MQTT_Client::received_data(ustring& received_packet){
 	// REWORK packet id return & proper acks
 	/// Parse & print acquired packet
 	int qos = 0;
+	uint16_t packet_id = 0;
 	switch(received_packet[0]>>4){
 		case CONNACK:
-			std::cout << "CONNACK" << " arrived.\n";
+			std::cout << "CONNACK arrived.\n";
 			if(received_packet.length() != 4 || 
 			   received_packet[2] != 0)
 				std::cerr << "Bad CONNACK packet\n";
@@ -359,14 +368,12 @@ int MQTT_Client::received_data(ustring& received_packet){
 					case 5: std::cerr << "Not authorized.\n"; break;
 				}
 			}
+			else connected = true;
 
-			if(rm_ack(CONNACK)){
-				std::cerr << "^^Unexpected packet.\n";
-			}
 			break;
 
 		case PUBLISH:
-			std::cout << "PUBLISH" << " arrived.\n";
+			std::cout << "PUBLISH arrived.\n";
 			qos = (received_packet[0]&0b0110) >> 1;
 			if(qos == 1){
 				std::cout << "Sending PUBACK.\n";
@@ -374,67 +381,43 @@ int MQTT_Client::received_data(ustring& received_packet){
 			break;
 
 		case PUBACK:
-			std::cout << "PUBACK" << " arrived.\n";
+			std::cout << "PUBACK arrived.\n";
+			packet_id = (received_packet[2] << 8) | received_packet[3];
 			break;
 
 		case PUBREC:
-			std::cout << "PUBREC" << " arrived.\n";
+			std::cout << "PUBREC arrived.\n";
+			/// Send PUBREL packet
+			/// Expect PUBCOMP packet
 			break;
 
 		case PUBREL:
-			std::cout << "PUBREL" << " arrived.\n";
+			std::cout << "PUBREL arrived.\n";
+			/// Send PUBCOMP packet
 			break;
 
-		case PUBCOMP:
-			std::cout << "PUBCOMP" << " arrived.\n";
-			break;
-
-		case SUBACK:
-			std::cout << "SUBACK" << " arrived.\n";
-			if(rm_ack(SUBACK)){
-				std::cerr << "^^Unexpected packet.\n";
-			}
-			break;
-
-		case UNSUBACK:
-			std::cout << "UNSUBACK" << " arrived.\n";
-			if(rm_ack(UNSUBACK)){
-				std::cerr << "^^Unexpected packet.\n";
-			}
-			break;
-
-		case PINGRESP:
-			std::cout << "PINGRESP" << " arrived.\n";
-			if(rm_ack(PINGRESP)){
-				std::cerr << "^^Unexpected packet.\n";
-			}
-			break;
-
-		case DISCONNECT:
-			std::cout << "DISCONNECT" << " arrived.\n";
-			break;
+		case PUBCOMP: std::cout << "PUBCOMP arrived.\n"; break;
+		case SUBACK: std::cout << "SUBACK arrived.\n"; break;
+		case UNSUBACK: std::cout << "UNSUBACK arrived.\n"; break;
+		case PINGRESP: std::cout << "PINGRESP arrived.\n"; break;
 
 		default:{
-				static int count = 0;
-				std::cout << "Oh no, anyway...(" << (received_packet[0]>>4) << "): " << count++ << " times.\n";
-				for(int i = 0; i < received_packet.size(); i++){
-					std::cout << std::internal << std::setfill('0');
-					std::cout << std::hex << std::setw(2) << static_cast<unsigned int>(received_packet[i]) << " ";
-					if(i%8 == 0) std::cout << std::endl;
-				}
-				std::cout << std::dec << std::endl;
-				char temp[] = {2,2,2};
-				if(std::memcmp(received_packet.c_str(), temp, 3) == 0){
-					tcp_receive(10);
-					ustring& tmp_str = pop_buffer();
-					for(int i = 0; i < tmp_str.size(); i++){
-						std::cout << std::internal << std::setfill('0');
-						std::cout << std::hex << std::setw(2) << static_cast<unsigned int>(tmp_str[i]) << " ";
-						if(i%8 == 0) std::cout << std::endl;
-					}
-				}
+			static int count = 0;
+			std::cout << "Oh no, anyway...(" << (received_packet[0]>>4) << "): " << count++ << " times.\n";
+			for(unsigned int i = 0; i < received_packet.size(); i++){
+				if(i%8 == 0) std::cout << std::endl;
+				std::cout << std::internal << std::setfill('0');
+				std::cout << std::hex << std::setw(2) << static_cast<unsigned int>(received_packet[i]) << " ";
 			}
+			std::cout << std::dec << std::endl;
+		}
 	}
+
+	if(received_packet[0]>>4 != PUBLISH &&
+	   rm_ack(std::make_tuple(static_cast<PacketType>(received_packet[0]>>4), packet_id))){
+		std::cerr << "^^Unexpected packet.\n";
+	}
+
 	std::cout << std::endl;
 
 	return 0;
