@@ -19,21 +19,21 @@ TCP_Client::TCP_Client(const std::string& ip_addr, int port)
 TCP_Client::~TCP_Client(){
 	tcp_disconnect();
 }
-int TCP_Client::tcp_connect(const std::string& ip_addr, int port){
-	// REWORK add dns server checking
-	int retval;
+int TCP_Client::tcp_connect(const std::string& hostname, int port){
+	/// Get IP through dns
+	struct	addrinfo* ai_ret;
 
-	retval = inet_aton(ip_addr.c_str(), &server_address.sin_addr);
-	if(retval < 0) return -1;
-	server_address.sin_port = htons(port);
-	server_address.sin_family = AF_INET;
+	int retval = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), NULL, &ai_ret);
+	if(retval) return -1;
+	server_address = *ai_ret->ai_addr;
 
+	/// Connect to the server
 	open_socket = socket(AF_INET, SOCK_STREAM, 0);
-	if(open_socket <= 0) return -2;
+	if(open_socket <= 0) return -3;
 
-	retval = connect(open_socket, reinterpret_cast<struct sockaddr*>(&server_address), sizeof(server_address));
-	if(retval) return -3;
-
+	retval = connect(open_socket, &server_address, sizeof(server_address));
+	freeaddrinfo(ai_ret);
+	if(retval) return -4;
 	return 0;
 }
 

@@ -1,7 +1,7 @@
 #ifndef TCP_CLIENT_H
 #define TCP_CLIENT_H
 
-#include <netinet/in.h>
+#include <sys/socket.h>
 #include <string>
 
 typedef std::basic_string<unsigned char> ustring;
@@ -23,7 +23,7 @@ class TCP_Client{
 
 	private:
 		int open_socket;
-		struct sockaddr_in server_address;
+		struct sockaddr server_address;
 		ustring buffer;
 		bool connected;
 };
