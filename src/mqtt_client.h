@@ -2,9 +2,9 @@
 #define MQTT_CLIENT_H
 
 #include "tcp_client.h"
-#include "shared.h"
 #include <vector>
 #include <cstdint>
+#include <iostream>
 
 enum PacketType{
 	RESERVED, // Forbidden

@@ -5,6 +5,7 @@
 #include <string>
 
 typedef std::basic_string<unsigned char> ustring;
+enum data_type_t{JSON,STRING,BIN};
 
 class TCP_Client{
 	public:

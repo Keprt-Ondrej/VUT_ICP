@@ -2,7 +2,7 @@
 #include "connectserver.h"
 #include "topichistory.h"
 
-#include "shared.h"
+
 #include <iostream>
 
 QModelIndex dEfAuLTgLOBAlInDeX = QModelIndex();

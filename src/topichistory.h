@@ -5,6 +5,7 @@
 #include <QDialog>
 #include <QtCore>
 #include <QtGui>
+#include "tcp_client.h"
 
 namespace Ui {
 class TopicHistory;

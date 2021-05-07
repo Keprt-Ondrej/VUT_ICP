@@ -5,11 +5,11 @@
 #include <unistd.h>
 
 #include <thread>
-#include "shared.h"
-#include "hello.cpp"
+
 #include <QApplication>
 #include "mainwindow.h"
 #include "connectserver.h"
+#include <iostream>
 
 
 void thread_test(MQTT_Client& client){
@@ -24,10 +24,10 @@ void thread_test(MQTT_Client& client){
 	}
 }
 
-Shared *activeShared;
+
 int main(int argc, char *argv[]) {  
 	/// Set up client info
-	MQTT_Client mqtt;
+	MQTT_Client mqtt;	
 	client_t data = {
 		"127.0.0.1", // only IP, DNS is not set up yet
 		6969,
@@ -80,75 +80,6 @@ int main(int argc, char *argv[]) {
 	std::cout << "Error of -5 is ok, it means that broker is not available anymore\n";
 
 
-  /* level00
-	 *  | topic0
-	 *  |
-	 *  + level10
-	 *  |  | topic2
-	 *  |  | topic3
-	 *  |
-	 *  + level11
-	 *  |  + level20
-	 *  |  |  | topic4
-	 *  |  |
-	 *  |  | topic5
-	 *  |
-	 *  | topic1
-	 *  | topic6
-	 */
-	std::string t0 = "10";
-	std::string t1 = "True";
-	std::string t2 = "420";
-	std::string t3 = "69";
-	std::string t4 = "dxfcgvbhjnmkl";
-	std::string t5 = "fthn";
-	TypedItem topic0("device", TOPIC, t0);
-	TypedItem topic1("something_else", TOPIC, t1);
-	TypedItem topic2("blazeit", TOPIC, t2);
-	TypedItem topic3("nice", TOPIC, t3);
-	TypedItem topic4("cghjk", TOPIC, t4);
-	TypedItem topic5("jhgytr78uoikl", TOPIC, t5);
-	TypedItem topic6("asdfg", TOPIC, t5);
-
-	std::vector<Item*> main_v;
-	std::vector<Item*> lvl10;
-	std::vector<Item*> lvl11;
-	std::vector<Item*> lvl20;
-
-	lvl20.push_back(&topic4);
-	TypedItem level20("level2", LEVEL, lvl20);
-
-	lvl11.push_back(&level20);
-	lvl11.push_back(&topic5);
-	TypedItem level11("other_level1", LEVEL, lvl11);
-
-	lvl10.push_back(&topic2);
-	lvl10.push_back(&topic3);
-	TypedItem level10("level1", LEVEL, lvl10);
-
-	main_v.push_back(&topic0);
-	main_v.push_back(&level10);
-	main_v.push_back(&level11);
-	main_v.push_back(&topic1);
-	TypedItem level00("", LEVEL, main_v);
-
-/*
-	std::cout << "==========================\n";
-	tree_print_recursive(&level00);
-	std::cout << "==========================\n";
-*/
-	level00.data.push_back(&topic6);
-
-	Shared oof(level00);
-/*
-	tree_print_recursive(oof.get_topics());
-    std::cout << "==========================\n";
-*/
-	Shared x;
-/*
-	tree_print_recursive(x.get_topics());
-    std::cout << "==========================\n";
-*/	
 	QList<QVariant> x1;
     for(int i=0; i<5; i++){
 		x1.append((double)i);
@@ -167,11 +98,6 @@ int main(int argc, char *argv[]) {
         //std::cout << x3.at(i).toDouble() << "\n";
 	}
 
-  
-  	Shared active(level00);
-	activeShared = &active; //potrebuji nejaky shared navazat jinak SIGSEG
-//	hi();
-	
 	std::vector<int> fiskus;
 	fiskus.push_back(5);
 	fiskus.push_back(42);

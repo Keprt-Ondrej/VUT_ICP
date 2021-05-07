@@ -1,11 +1,10 @@
 #include "topichistory.h"
 #include "ui_topichistory.h"
-#include "shared.h"
 
-TopicHistory::TopicHistory(QModelIndex &dataHistory,QWidget *parent) :
-    dataHistory(dataHistory),
+TopicHistory::TopicHistory(QModelIndex &dataHistory,QWidget *parent) :    
     QDialog(parent),
-    ui(new Ui::TopicHistory)
+    ui(new Ui::TopicHistory),
+    dataHistory(dataHistory)
 {  
     ui->setupUi(this);
     qInfo() << dataHistory.data(0);    //TODO SMAZAT    

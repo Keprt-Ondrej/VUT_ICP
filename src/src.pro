@@ -22,14 +22,12 @@ SOURCES += \
         connectserver.cpp \
         main.cpp \
         mainwindow.cpp \
-        shared.cpp \
         tcp_client.cpp \
         mqtt_client.cpp \
         topichistory.cpp    
 
 HEADERS += \
-        connectserver.h \        
-        shared.h  \
+        connectserver.h \
         mainwindow.h \      
         tcp_client.h \
         mqtt_client.h \

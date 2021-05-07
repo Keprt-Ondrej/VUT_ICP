@@ -1,6 +1,5 @@
 
 #include "connectserver.h"
-#include "shared.h"
 
 ConnectServer::ConnectServer(QWidget *parent) :
     QDialog(parent),
@@ -27,6 +26,6 @@ void ConnectServer::storeConnectionInfo(){
     std::string username = usernameQS.toUtf8().constData();
     QString passwordQS = ui->Password->text();
     std::string password = passwordQS.toUtf8().constData();
-    activeShared->setConnectionInfo(protocol,host,port,username,password);
+    //activeShared->setConnectionInfo(protocol,host,port,username,password);
     close();
 }
