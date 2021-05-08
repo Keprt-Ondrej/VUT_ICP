@@ -14,3 +14,4 @@ src/mainwindow.ui.autosave
 src/mainwindow.ui
 src/ui_topichistory.h
 src/moc_topichistory.cpp
+src/ui_showbinarydata.h

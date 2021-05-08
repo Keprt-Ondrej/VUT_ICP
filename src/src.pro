@@ -22,13 +22,15 @@ SOURCES += \
         connectserver.cpp \
         main.cpp \
         mainwindow.cpp \
+        showbinarydata.cpp \
         tcp_client.cpp \
         mqtt_client.cpp \
         topichistory.cpp    
 
 HEADERS += \
         connectserver.h \
-        mainwindow.h \      
+        mainwindow.h \
+        showbinarydata.h \
         tcp_client.h \
         mqtt_client.h \
         topichistory.h
@@ -37,4 +39,5 @@ HEADERS += \
 FORMS += \
         connectserver.ui \
         mainwindow.ui \
+        showbinarydata.ui \
         topichistory.ui

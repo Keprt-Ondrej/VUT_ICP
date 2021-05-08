@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "connectserver.h"
 #include "topichistory.h"
-
+#include "showbinarydata.h"
 
 #include <iostream>
 
@@ -32,7 +32,7 @@ MainWindow::MainWindow(MQTT_Client &mqtt,QWidget *parent) :
   QList<QVariant> my_list_types;  //BOOL nejde, protoze pak pi nesel ulozit do QVariant
   for (int i = 0;i < 1000;i++){
     my_list.push_front((double)i);
-    my_list_types.push_front(STRING);
+    my_list_types.push_front(BIN);
   }  
 
   item3->setData((bool)true,3);   
@@ -43,13 +43,7 @@ MainWindow::MainWindow(MQTT_Client &mqtt,QWidget *parent) :
 
   item3->setForeground(QBrush(receivedColor));
   item4->setForeground(QBrush(sendColor));
-
-  if (item3->data(4).toBool()){
-    std::cout << "Hell YEAH\n";
-  }
-  else {
-    std::cout << "Hell NO\n";
-  }
+ 
 
   model->appendRow(item0);
   item0->appendRow(item3);
@@ -67,14 +61,9 @@ MainWindow::MainWindow(MQTT_Client &mqtt,QWidget *parent) :
   std::string karel = strQ.toString().toStdString();
   std::cout << "vytahnutej: " << karel << std::endl;
 */
-  
 
-  
-  ui->TreeView->setModel(model);
-
-  //std::cout << "KAREEEEEEEEL" << my_karel[1] << std::endl;
-
-  }
+  ui->TreeView->setModel(model); 
+}
 
 MainWindow::~MainWindow()
 {
@@ -99,18 +88,42 @@ void MainWindow::on_actionNew_Topic_triggered()
   std::cout << "new topic button" << std::endl;    
 }
 
+void ShowBinaryDataWindow(QByteArray &data){
+  ShowBinaryData ShowBinaryDataWindow(data);
+  ShowBinaryDataWindow.setModal(true);
+  ShowBinaryDataWindow.setWindowFlags(Qt::Window);
+  ShowBinaryDataWindow.setWindowTitle("Binary Data");
+  ShowBinaryDataWindow.exec();  
+}
+
 void MainWindow::on_TopicShowInNewWindow_released()
-{
-    std::cout << "new window button" << std::endl;
+{  
+  if (!displayedData.isValid()){
+    ui->TopicTextView->setText("Choose Topic!");
+    return;
+  }
+
+  int type = displayedData.data(5).toList().at(0).toInt();
+  if ((type == STRING) || (type == JSON)){
+    //display text
+    displayedData.data(6).toList().at(0);
+  }
+  else{
+    QByteArray data = displayedData.data(6).toList().at(0).toByteArray();
+    ShowBinaryDataWindow(data); 
+  }  
 }
 
 void MainWindow::on_TopicHistory_released(){
+  if (!displayedData.isValid()){
+    ui->TopicTextView->setText("Choose Topic!");
+    return;
+  }
   TopicHistory TopicHistoryWindow(displayedData);
   TopicHistoryWindow.setModal(false);
   TopicHistoryWindow.setWindowFlags(Qt::Window);
   TopicHistoryWindow.setWindowTitle("Topic History");
-  TopicHistoryWindow.exec();
-  
+  TopicHistoryWindow.exec();  
 }
 
 void MainWindow::on_TopicEdit_released()
@@ -150,11 +163,11 @@ void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index){
       ui->TopicTextView->setText(stringData);
       */   
     } 
-    else{
-      stringData = "Data nejsou string";
-      ui->TopicTextView->setText(stringData);
+    else{      
+      ui->TopicTextView->setText("Data are BINARY, use Show in new window button");
+      QByteArray data = index.data(6).toList().at(0).toByteArray(); 
+      ShowBinaryDataWindow(data); 
     }
   }
-  qInfo() << "Tree value: " << index.data(0); //vraci jmeno TODO SMAZAT
 }
 //https://www.youtube.com/watch?v=M0PZDrDwdHM  tree directory

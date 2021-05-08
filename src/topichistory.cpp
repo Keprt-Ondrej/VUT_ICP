@@ -1,5 +1,7 @@
 #include "topichistory.h"
 #include "ui_topichistory.h"
+#include "mainwindow.h"
+#include "showbinarydata.h"
 
 TopicHistory::TopicHistory(QModelIndex &dataHistory,QWidget *parent) :    
     QDialog(parent),
@@ -8,6 +10,7 @@ TopicHistory::TopicHistory(QModelIndex &dataHistory,QWidget *parent) :
 {  
     ui->setupUi(this);
     qInfo() << dataHistory.data(0);    //TODO SMAZAT    
+    
     QStandardItemModel* model = new QStandardItemModel();     
     ui->path->setText(dataHistory.data(7).toString());
 
