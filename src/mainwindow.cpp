@@ -60,6 +60,7 @@ MainWindow::MainWindow(MQTT_Client &mqtt,QWidget *parent) :
   item4->setData(my_list_types1,5);
   item4->setData(my_list1,6);  
   item4->setForeground(QBrush(sendColor));
+  item4->setData("/karel/sel/na/pomoc/do/bytu",7);
  
 
   model->appendRow(item0);
@@ -100,7 +101,7 @@ void MainWindow::on_actionConnect_server_triggered()
 
 void MainWindow::on_actionNew_Topic_triggered()
 {
-  NewAndEditTopic NT(nullptr);
+  NewAndEditTopic NT(sharedMqtt,nullptr);
   //qInfo() << NT;  
   NT.setModal(false);
   NT.setWindowFlags(Qt::Window);
@@ -155,7 +156,25 @@ void MainWindow::on_TopicHistory_released(){
 
 void MainWindow::on_TopicEdit_released()
 {
-    std::cout << "edit topic" << std::endl;
+  if (!displayedData.isValid()){
+    ui->TopicTextView->setText("Choose Topic!");
+    return;
+  }
+  QString path = displayedData.data(7).toString();
+  int type = displayedData.data(5).toList().at(0).toInt();  
+  QString tmpData = ""; //for error handler and if data were binary
+  QString &data = tmpData; 
+  if ((type == STRING) || (type == JSON)){
+    data = displayedData.data(6).toList().at(0).toString();
+  }
+  else{
+    data = tmpData;
+  }
+  NewAndEditTopic ET(sharedMqtt,path,data,nullptr);
+  ET.setModal(false);
+  ET.setWindowFlags(Qt::Window);
+  ET.setWindowTitle("Edit topic");
+  ET.exec();
 }
 
 void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index){   
