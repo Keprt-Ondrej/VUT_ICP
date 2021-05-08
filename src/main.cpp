@@ -26,6 +26,7 @@ void thread_test(MQTT_Client& client){
 
 
 int main(int argc, char *argv[]) {  
+	QApplication a(argc, argv);
 	/// Set up client info
 	MQTT_Client mqtt;	
 	client_t data = {
@@ -35,6 +36,9 @@ int main(int argc, char *argv[]) {
         "",
         ""
 	};
+
+	//connectServerNewWindow(mqtt); // funkce si zavola int MQTT_Client::broker_connect(client_t info)
+
 
 	/// Connect to MQTT broker
 
@@ -102,7 +106,7 @@ int main(int argc, char *argv[]) {
 	fiskus.push_back(5);
 	fiskus.push_back(42);
 
-	QApplication a(argc, argv);
+	
 	//connectServerNewWindow();
 	MainWindow w(mqtt);
 	w.show();

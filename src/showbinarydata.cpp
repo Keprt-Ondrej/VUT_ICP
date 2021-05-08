@@ -9,17 +9,17 @@ ShowBinaryData::ShowBinaryData(QByteArray &data,QWidget *parent) :
     data(data)
 {
     ui->setupUi(this);
+/*
     QFile CurrentFile("examples/cats.jpg");
     if(!CurrentFile.open(QIODevice::ReadOnly)) return;
     QByteArray DataFile = CurrentFile.readAll();
     //QPixmap pix("examples/cats.jpg");
     QPixmap pix(DataFile.size(),1);
     pix.loadFromData(DataFile);     
-
-    //ready for data from server
-    //QPixmap pix(data.size(),1);
-    //pix.loadFromData(data); 
-      
+*/
+    
+    QPixmap pix(data.size(),1);
+    pix.loadFromData(data);
     ui->binDataView->setPixmap(pix);
 }
 

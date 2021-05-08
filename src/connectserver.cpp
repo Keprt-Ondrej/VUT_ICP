@@ -1,9 +1,12 @@
 
 #include "connectserver.h"
+#include "mqtt_client.h"
+#include <QMessageBox>
 
-ConnectServer::ConnectServer(QWidget *parent) :
+ConnectServer::ConnectServer(MQTT_Client &mqtt,QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ConnectServer)
+    ui(new Ui::ConnectServer),
+    mqtt(mqtt)
 {
     //this->setAttribute( Qt::WA_DeleteOnClose);
     ui->setupUi(this);    
@@ -26,6 +29,22 @@ void ConnectServer::storeConnectionInfo(){
     std::string username = usernameQS.toUtf8().constData();
     QString passwordQS = ui->Password->text();
     std::string password = passwordQS.toUtf8().constData();
-    //activeShared->setConnectionInfo(protocol,host,port,username,password);
-    close();
+    client_t info{
+        host,
+        port,
+        username,
+        password,
+        ""          //client_id
+    };
+    int result = mqtt.broker_connect(info);
+
+    if (result == 0){
+        close();    //uspech, zavrit okno
+    }   
+
+    //neuspech:
+    QMessageBox messageBox;
+    messageBox.setFixedSize(500,200);
+    //TODO dodelat switch na ruzne error msg
+    messageBox.critical(0,"Error","An error has occured!");
 }

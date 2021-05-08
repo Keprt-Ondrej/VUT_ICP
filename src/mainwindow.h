@@ -29,8 +29,7 @@ public:
   QModelIndex &displayedData;
   MQTT_Client &sharedMqtt;  
 
-private slots: 
-  void connectServerNewWindow();
+private slots:   
   void on_actionConnect_server_triggered();
   void on_actionNew_Topic_triggered();
   void on_TopicShowInNewWindow_released();
@@ -40,5 +39,6 @@ private slots:
 };
 
 void ShowBinaryDataWindow(QByteArray &data);
+void connectServerNewWindow(MQTT_Client &mqtt);
 
 #endif // MAINWINDOW_H

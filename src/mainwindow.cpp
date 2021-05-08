@@ -26,13 +26,13 @@ MainWindow::MainWindow(MQTT_Client &mqtt,QWidget *parent) :
   QStandardItem* item0 = new QStandardItem("1 first item");
   QStandardItem* item1 = new QStandardItem( "2 second item");
   QStandardItem* item3 = new QStandardItem("TESTOVACI DATA HERE");
-  QStandardItem* item4 = new QStandardItem("4 forth item");
+  QStandardItem* item4 = new QStandardItem("Cute kittens");
 
   QList<QVariant> my_list;
-  QList<QVariant> my_list_types;  //BOOL nejde, protoze pak pi nesel ulozit do QVariant
+  QList<QVariant> my_list_types;  //BOOL nejde, protoze pak by nesel ulozit do QVariant
   for (int i = 0;i < 1000;i++){
     my_list.push_front((double)i);
-    my_list_types.push_front(BIN);
+    my_list_types.push_front(STRING);
   }  
 
   item3->setData((bool)true,3);   
@@ -40,8 +40,22 @@ MainWindow::MainWindow(MQTT_Client &mqtt,QWidget *parent) :
   item3->setData(my_list_types,5);
   item3->setData(my_list,6);  
   item3->setData("/karel/sel/na/pomoc/do/bytu",7);
-
   item3->setForeground(QBrush(receivedColor));
+
+
+  QList<QVariant> my_list1;
+  QList<QVariant> my_list_types1;
+  my_list_types1.push_front(BIN);
+
+  QFile CurrentFile("examples/cats.jpg");
+  if(!CurrentFile.open(QIODevice::ReadOnly)) return;
+  QByteArray DataFile = CurrentFile.readAll();
+  QVariant binaryImage = DataFile;
+  my_list1.push_front(binaryImage);
+  item4->setData((bool)true,3);   
+  item4->setData((bool)true,4);
+  item4->setData(my_list_types1,5);
+  item4->setData(my_list1,6);  
   item4->setForeground(QBrush(sendColor));
  
 
@@ -70,16 +84,15 @@ MainWindow::~MainWindow()
   delete ui;
 }
 
-void MainWindow::connectServerNewWindow(){
-  ConnectServer connectServerWindow;
+void connectServerNewWindow(MQTT_Client &mqtt){
+  ConnectServer connectServerWindow(mqtt);
   connectServerWindow.setModal(true);
   connectServerWindow.exec();
 }
 
 void MainWindow::on_actionConnect_server_triggered()
-{
-    //CONNECT SERVER
-    connectServerNewWindow();
+{    
+  connectServerNewWindow(sharedMqtt);
 }
 
 void MainWindow::on_actionNew_Topic_triggered()
@@ -130,23 +143,6 @@ void MainWindow::on_TopicEdit_released()
 {
     std::cout << "edit topic" << std::endl;
 }
-
-//TODO NAKONCI SMAZAT
-/*
-void MainWindow::AddRoot(QString name, QString Description){
-  QTreeWidgetItem *item = new QTreeWidgetItem(ui->TreeWidget);
-  item->setText(0,name);
-  qInfo() << Description;
-  ui->TreeWidget->addTopLevelItem(item);
-}
-
-void MainWindow::AddChild(QTreeWidgetItem *parent, QString name, QString Description){
-  QTreeWidgetItem *item = new QTreeWidgetItem();
-  item->setText(0,name);
-  qInfo() << Description;
-  parent->addChild(item);
-}
-*/
 
 void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index){   
   if (index.data(3).toBool()){ //je topic
