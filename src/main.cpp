@@ -30,8 +30,8 @@ int main(int argc, char *argv[]) {
 	/// Set up client info
 	MQTT_Client mqtt;	
 	client_t data = {
-		"test.mosquitto.org",
-        1883,
+		"127.0.0.1",
+        6969,
         "",
         "",
         ""
@@ -66,8 +66,8 @@ int main(int argc, char *argv[]) {
 	std::cout << "Expecting SUBACK(9)&PUBLISH(3) because of retained value\n";
 	retval = mqtt.subscribe("#");
 	if(retval) std::cerr << "Function subscribe returned with: "<< retval << std::endl;
-	//retval = mqtt.subscribe("$SYS/#");
-	//if(retval) std::cerr << "Function subscribe returned with: "<< retval << std::endl;
+	retval = mqtt.subscribe("$SYS/#");
+	if(retval) std::cerr << "Function subscribe returned with: "<< retval << std::endl;
 	
 	std::cout << "Expecting UNSUBACK(11)\n";
 	retval = mqtt.unsubscribe("lol");
@@ -78,8 +78,6 @@ int main(int argc, char *argv[]) {
 	//std::cin >> lol;
 
 	usleep(500000);
-	mqtt.broker_disconnect();
-	recv_thrd.join();
 
 	std::cout << "Error of -5 is ok, it means that broker is not available anymore\n";
 
@@ -111,6 +109,11 @@ int main(int argc, char *argv[]) {
 	MainWindow w(mqtt);
 	w.show();
 
-	return a.exec();
+	retval = a.exec();
+
+	mqtt.broker_disconnect();
+	recv_thrd.join();
+
+	return retval;
 }
 //char c[] = {0x10, 38, 0, 4, 'M', 'Q', 'T', 'T', 4, 2, 0, 0x3c, 0, 26, 'P', 'y', 'y', '_', 'y', 'y', 'y', 'y', '_', 'y', 'y', 'y', 'y', 'y', 'y', 'y', 'y', '_', 'y', 'y', 'y', 'y', 'y', 'y', 'y', 'y'};
