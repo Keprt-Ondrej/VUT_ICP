@@ -23,7 +23,7 @@ SOURCES += \
         fulltextwindow.cpp \
         main.cpp \
         mainwindow.cpp \
-        newtopic.cpp \
+        newandedittopic.cpp \
         showbinarydata.cpp \
         tcp_client.cpp \
         mqtt_client.cpp \
@@ -33,7 +33,7 @@ HEADERS += \
         connectserver.h \
         fulltextwindow.h \
         mainwindow.h \
-        newtopic.h \
+        newandedittopic.h \
         showbinarydata.h \
         tcp_client.h \
         mqtt_client.h \
@@ -44,6 +44,6 @@ FORMS += \
         connectserver.ui \
         fulltextwindow.ui \
         mainwindow.ui \
-        newtopic.ui \
+        newandedittopic.ui \
         showbinarydata.ui \
         topichistory.ui

@@ -36,6 +36,7 @@ private slots:
   void on_TopicHistory_released();
   void on_TopicEdit_released();
   void on_TreeView_doubleClicked(const QModelIndex &index);  
+  void on_actionDashboard_triggered();
 };
 
 void ShowBinaryDataWindow(QByteArray &data);

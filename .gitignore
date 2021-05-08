@@ -20,3 +20,6 @@ src/moc_newtopic.cpp
 src/ui_newtopic.h
 src/ui_fulltextwindow.h
 src/moc_fulltextwindow.cpp
+src/ui_newEditTopic.h
+src/ui_newandedittopic.h
+src/moc_newandedittopic.cpp

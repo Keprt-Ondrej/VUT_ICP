@@ -3,7 +3,8 @@
 #include "topichistory.h"
 #include "showbinarydata.h"
 #include "fulltextwindow.h"
-
+#include "newandedittopic.h"
+#include <QMessageBox>
 #include <iostream>
 
 QModelIndex dEfAuLTgLOBAlInDeX = QModelIndex();
@@ -98,12 +99,17 @@ void MainWindow::on_actionConnect_server_triggered()
 
 void MainWindow::on_actionNew_Topic_triggered()
 {
-  //NEW TOPIC  
-  std::cout << "new topic button" << std::endl;    
+  NewAndEditTopic NT(nullptr);
+  //qInfo() << NT;  
+  NT.setModal(false);
+  NT.setWindowFlags(Qt::Window);
+  NT.setWindowTitle("New topic");
+  NT.exec();
+  
 }
 
 void ShowBinaryDataWindow(QByteArray &data){
-  ShowBinaryData ShowBinaryDataWindow(data);
+  ShowBinaryData ShowBinaryDataWindow(data);  
   ShowBinaryDataWindow.setModal(true);
   ShowBinaryDataWindow.setWindowFlags(Qt::Window);
   ShowBinaryDataWindow.setWindowTitle("Binary Data");
@@ -174,3 +180,11 @@ void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index){
   }
 }
 //https://www.youtube.com/watch?v=M0PZDrDwdHM  tree directory
+
+void MainWindow::on_actionDashboard_triggered()
+{
+    //DASHBOARD
+    QMessageBox messageBox;
+    messageBox.setFixedSize(500,200);
+    messageBox.critical(0,"Error","Not implemented");
+}
