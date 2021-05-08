@@ -481,11 +481,28 @@ int MQTT_Client::received_data(ustring& received_packet){
 	return 0;
 }
 
-std::pair<std::string,std::string> getPath(std::string path){    
-    std::string delimiter = "/";
-    std::string name = path.substr(0, path.find(delimiter)); // name is "scott"
-    path.erase(0, path.find(delimiter) + delimiter.length());
-    return std::make_pair(name, path);
+std::pair<std::string,std::string> getPath(std::string path){
+	std::string delimiter = "/";
+	std::string name = path.substr(0, path.find(delimiter));
+	path.erase(0, path.find(delimiter) + delimiter.length());
+	return std::make_pair(name, path);
+}
+
+data_type_t data_type(std::string& data){
+	if(static_cast<uint8_t>(data[0]) == 0xFF &&
+	   static_cast<uint8_t>(data[1]) == 0xD8 &&
+	   static_cast<uint8_t>(data[2]) == 0xFF) // JPEG
+		return BIN;
+	else if(static_cast<uint8_t>(data[0]) == 137 && // PNG
+			static_cast<uint8_t>(data[1]) == 80 &&
+			static_cast<uint8_t>(data[2]) == 78 &&
+			static_cast<uint8_t>(data[3]) == 71 &&
+			static_cast<uint8_t>(data[4]) == 13 &&
+			static_cast<uint8_t>(data[5]) == 10 &&
+			static_cast<uint8_t>(data[6]) == 26 &&
+			static_cast<uint8_t>(data[7]) == 10)
+		return BIN;
+	return STRING;
 }
 
 int update_topic(QStandardItem* item, std::string& name, std::string value, int depth){
@@ -520,7 +537,7 @@ int update_topic(QStandardItem* item, std::string& name, std::string value, int 
 				QList<QVariant> my_list_types;
 
 				my_list.push_front(QString::fromStdString(value));
-				my_list_types.push_front(STRING);
+				my_list_types.push_front(data_type(value));
 
 				item->setData(true, 3);
 				item->setData(true, 4);
@@ -533,9 +550,15 @@ int update_topic(QStandardItem* item, std::string& name, std::string value, int 
 			}
 		}
 		else{
-			item->data(5).toList().push_front(STRING);
-			item->data(6).toList().push_front(QString::fromStdString(value));
+			QList<QVariant> my_list_types = item->data(5).toList();
+			QList<QVariant> my_list = item->data(6).toList();
+
+			my_list_types.push_front(data_type(value));
+			my_list.push_front(QString::fromStdString(value));
+			item->setData(my_list_types, 5);
+			item->setData(my_list, 6);
 			item->setForeground(QBrush(QColor(250,0,0)));
+
 			return 0;
 		}
 	}
@@ -607,7 +630,7 @@ void MQTT_Client::update_tree(ustring& packet){
 		QList<QVariant> my_list_types;
 
 		my_list.push_front(QString::fromStdString(value));
-		my_list_types.push_front(STRING);
+		my_list_types.push_front(data_type(value));
 
 		item->setData(true, 3);
 		item->setData(true, 4);
