@@ -10,17 +10,23 @@
 #include "mainwindow.h"
 #include "connectserver.h"
 #include <iostream>
+#include <ctime>
 
 
 void thread_test(MQTT_Client& client){
 	int retval;
+	time_t last_ping = time(0);
 	while(client.get_connected()){
 		retval = client.mqtt_recv(50);
-		if(retval == -2){
+		if(retval == -2 || last_ping+50 <= time(0)){
 			std::cerr << "MQTT timeout.\n";
 			client.ping();
+			last_ping = time(0);
 		}
-		else if(retval) std::cerr << "Some error occured: " << retval << std::endl;
+		else if(retval){
+			std::cerr << "Some error occured: " << retval << std::endl;
+			break;
+		}
 	}
 }
 
@@ -59,7 +65,7 @@ int main(int argc, char *argv[]) {
 	if(retval) std::cerr << "Function ping returned with: "<< retval << std::endl;
 	
 	std::cout << "Expecting PUBACK(PUBLISH with 1 QoS)\n";
-	retval = mqtt.publish("lol", "69", {0,1,1});
+	retval = mqtt.publish("lol", "69", {0,1,0});
 	if(retval) std::cerr << "Function publish returned with: "<< retval << std::endl;
 	
 
