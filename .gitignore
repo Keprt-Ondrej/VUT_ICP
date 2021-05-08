@@ -16,3 +16,7 @@ src/ui_topichistory.h
 src/moc_topichistory.cpp
 src/ui_showbinarydata.h
 src/moc_showbinarydata.cpp
+src/moc_newtopic.cpp
+src/ui_newtopic.h
+src/ui_fulltextwindow.h
+src/moc_fulltextwindow.cpp

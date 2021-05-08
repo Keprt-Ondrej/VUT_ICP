@@ -2,6 +2,7 @@
 #include "connectserver.h"
 #include "topichistory.h"
 #include "showbinarydata.h"
+#include "fulltextwindow.h"
 
 #include <iostream>
 
@@ -117,9 +118,15 @@ void MainWindow::on_TopicShowInNewWindow_released()
   }
 
   int type = displayedData.data(5).toList().at(0).toInt();
-  if ((type == STRING) || (type == JSON)){
-    //display text
-    displayedData.data(6).toList().at(0);
+  if ((type == STRING) || (type == JSON)){    
+    QString data = displayedData.data(6).toList().at(0).toString();
+    QString path = displayedData.data(7).toString();
+
+    fullTextWindow ft(data,path);
+    ft.setModal(true);
+    ft.setWindowFlags(Qt::Window);
+    ft.setWindowTitle("Topic");
+    ft.exec();
   }
   else{
     QByteArray data = displayedData.data(6).toList().at(0).toByteArray();

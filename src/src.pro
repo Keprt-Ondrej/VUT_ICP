@@ -20,8 +20,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         connectserver.cpp \
+        fulltextwindow.cpp \
         main.cpp \
         mainwindow.cpp \
+        newtopic.cpp \
         showbinarydata.cpp \
         tcp_client.cpp \
         mqtt_client.cpp \
@@ -29,7 +31,9 @@ SOURCES += \
 
 HEADERS += \
         connectserver.h \
+        fulltextwindow.h \
         mainwindow.h \
+        newtopic.h \
         showbinarydata.h \
         tcp_client.h \
         mqtt_client.h \
@@ -38,6 +42,8 @@ HEADERS += \
 
 FORMS += \
         connectserver.ui \
+        fulltextwindow.ui \
         mainwindow.ui \
+        newtopic.ui \
         showbinarydata.ui \
         topichistory.ui
