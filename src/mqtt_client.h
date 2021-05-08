@@ -2,9 +2,12 @@
 #define MQTT_CLIENT_H
 
 #include "tcp_client.h"
+#include "shared.h"
 #include <vector>
 #include <cstdint>
-#include <iostream>
+#include <QtCore>
+
+//enum data_type_t{JSON, STRING, BIN}
 
 enum PacketType{
 	RESERVED, // Forbidden
@@ -52,6 +55,7 @@ class MQTT_Client : private TCP_Client{
 		int unsubscribe(const std::string& topic);
 		int ping();
 		int mqtt_recv(int timeout);
+		void set_tree_root(QStandardItemModel* root);
 		bool get_connected();
 
 	private:
@@ -63,11 +67,13 @@ class MQTT_Client : private TCP_Client{
 		int rm_ack(std::tuple<PacketType, uint16_t> ack);
 		int rm_packet_id(uint16_t packet_id);
 		int received_data(ustring& received_packet);
+		void update_tree(ustring& packet);
 
 		client_t client;
 		std::vector<std::tuple<PacketType, uint16_t>> pending_ack; // ack type, packet_id and ?timestamp(not yet)
 		std::vector<uint16_t> unavailable_packet_id;
 		bool connected;
+		QStandardItemModel* tree_root;
 
 };
 

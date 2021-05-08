@@ -16,7 +16,7 @@
 	packet += static_cast<char>(len&0xFF); 
 
 MQTT_Client::MQTT_Client()
-: connected(false){}
+: connected(false), tree_root(NULL){}
 
 MQTT_Client::MQTT_Client(client_t info)
 : connected(false){
@@ -281,6 +281,10 @@ int MQTT_Client::mqtt_recv(int timeout){
 	return 0;
 }
 
+void MQTT_Client::set_tree_root(QStandardItemModel* root){
+	tree_root = root;
+}
+
 bool MQTT_Client::get_connected(){
 	return connected;
 }
@@ -344,17 +348,16 @@ uint16_t MQTT_Client::available_packet_id(){
 
 void MQTT_Client::add_ack(std::tuple<PacketType, uint16_t> ack){
 	pending_ack.push_back(ack);
-	std::cout << pending_ack.size() << std::endl;
 }
 
 int MQTT_Client::rm_ack(std::tuple<PacketType, uint16_t> ack){
 	if(*pending_ack.begin() == ack){
 		pending_ack.erase(pending_ack.begin());
-		std::cout << pending_ack.size();
 		rm_packet_id(std::get<1>(ack));
 	}
 	else{
-		std::cerr << "Expecting: " << std::get<0>(*pending_ack.begin()) << std::endl;
+		std::cerr << "Expecting: " << std::get<0>(*pending_ack.begin()) << ", " << std::get<1>(*pending_ack.begin()) << std::endl;
+		std::cerr << "Got:       " << std::get<0>(ack) << ", " << std::get<1>(ack) << std::endl;
 		return -1;
 	}
 	return 0;
@@ -396,8 +399,25 @@ int MQTT_Client::received_data(ustring& received_packet){
 		case PUBLISH:
 			std::cout << "PUBLISH arrived.\n";
 			qos = (received_packet[0]&0b0110) >> 1;
-			if(qos == 1){
-				std::cout << "Sending PUBACK.\n";
+			update_tree(received_packet);
+			if(qos != 0){
+				uint16_t tmp_len = (received_packet[2] << 8) | received_packet[3];
+				packet_id = (received_packet[2+tmp_len] << 8) | received_packet[3+tmp_len];
+				if(qos == 1){
+					std::cout << "Sending PUBACK.\n";
+					char puback_packet[] = {static_cast<char>(PUBACK<<4), 2, static_cast<char>((packet_id>>8)&0x0F), static_cast<char>(packet_id&0x0F)};
+					int retval = tcp_send(puback_packet, 4);
+					if(retval) return retval-10;
+				}
+				else if(qos == 2){
+					std::cout << "Sending PUBREC.\n";
+					char pubrec_packet[] = {static_cast<char>(PUBREC<<4), 2, static_cast<char>((packet_id>>8)&0x0F), static_cast<char>(packet_id&0x0F)};
+					int retval = tcp_send(pubrec_packet, 4);
+					if(retval) return retval-10;
+
+					/// Expect PUBREL packet
+					add_ack(std::make_tuple(PUBREL, packet_id));
+				}
 			}
 			break;
 
@@ -410,7 +430,7 @@ int MQTT_Client::received_data(ustring& received_packet){
 				std::cout << "PUBREC arrived.\n";
 				/// Send PUBREL packet
 				packet_id = (received_packet[2] << 8) | received_packet[3];
-				char pubrel_packet[] = {static_cast<char>(PUBREL<<4), 2, static_cast<char>((packet_id>>8)&0x0F), static_cast<char>(packet_id&0x0F)};
+				char pubrel_packet[] = {static_cast<char>((PUBREL<<4)|2), 2, static_cast<char>(received_packet[2]), static_cast<char>(received_packet[3])};
 				int retval = tcp_send(pubrel_packet, 4);
 				if(retval) return retval-10;
 
@@ -429,7 +449,11 @@ int MQTT_Client::received_data(ustring& received_packet){
 			}
 			break;
 
-		case PUBCOMP: std::cout << "PUBCOMP arrived.\n"; break;
+		case PUBCOMP:
+			std::cout << "PUBCOMP arrived.\n";
+			packet_id = (received_packet[2] << 8) | received_packet[3];
+			break;
+
 		case SUBACK: std::cout << "SUBACK arrived.\n"; break;
 		case UNSUBACK: std::cout << "UNSUBACK arrived.\n"; break;
 		case PINGRESP: std::cout << "PINGRESP arrived.\n"; break;
@@ -446,7 +470,7 @@ int MQTT_Client::received_data(ustring& received_packet){
 		}
 	}
 
-	if(received_packet[0]>>4 != PUBLISH &&
+	if(((received_packet[0]>>4)&0x0F) != PUBLISH &&
 	   rm_ack(std::make_tuple(static_cast<PacketType>(received_packet[0]>>4), packet_id))){
 		std::cerr << "^^Unexpected packet.\n";
 	}
@@ -454,4 +478,127 @@ int MQTT_Client::received_data(ustring& received_packet){
 	std::cout << std::endl;
 
 	return 0;
+}
+
+std::pair<std::string,std::string> getPath(std::string path){    
+    std::string delimiter = "/";
+    std::string name = path.substr(0, path.find(delimiter)); // name is "scott"
+    path.erase(0, path.find(delimiter) + delimiter.length());
+    return std::make_pair(name, path);
+}
+
+int update_topic(QStandardItem* item, std::string& name, std::string value, int depth){
+	if(item == NULL || depth < 0) return -1;
+	std::pair<std::string,std::string> path = getPath(name);
+	static std::string full_path = "";
+	full_path += item->data(0).toString().toStdString() + "/";
+	if(item->data(0).toString().toStdString() == path.first){
+		if(item->hasChildren()){
+			int retval = -1;
+			depth--;
+			for(int i = 0; i < item->rowCount(); i++){
+				retval = update_topic(item->child(i), path.second, value, depth);
+				if(retval == 0) return 0;
+			}
+			depth++;
+			if(retval == -1){
+				for(int i = 0; i < depth; i++){
+  					path = getPath(path.second);
+  					if(i == depth-1)
+  						full_path += item->data(0).toString().toStdString();
+					else
+						full_path += item->data(0).toString().toStdString() + "/";
+					QStandardItem* new_level = new QStandardItem(path.first.c_str());
+					new_level->setData(false, 3);
+					new_level->setData(true, 4);
+					new_level->setData(QString::fromStdString(full_path), 7);
+  					item->appendRow(new_level);
+  					item = new_level;
+				}
+				item->setData(true, 3);
+				item->setData(true, 4);
+				item->setData(STRING, 5);
+				item->setData(QString::fromStdString(value), 6);
+				item->setData(QString::fromStdString(full_path), 7);
+				item->setForeground(QBrush(QColor(250,0,0)));
+				full_path.clear();
+				return 0;
+			}
+		}
+		else{
+			item->setData(QString::fromStdString(value), 6);
+			item->setForeground(QBrush(QColor(250,0,0)));
+			return 0;
+		}
+	}
+	full_path.erase(full_path.end()-item->data(0).toString().size()-1, full_path.end());
+	return -1;
+}
+
+void MQTT_Client::update_tree(ustring& packet){
+	if(tree_root == NULL) return;
+
+	/// Find/create topic
+	std::string topic;
+	int depth = 0;
+	uint32_t remaining_length = from_remaining_len(&(packet.c_str()[1]));
+	int t_index = 0;
+	if(remaining_length >= 0x80){
+		if(remaining_length >= 0x8000){
+			if(remaining_length >= 0x800000)
+				t_index = 5;
+			else t_index = 4;
+		}
+		else t_index = 3;
+	}
+	else t_index = 2;
+
+	uint16_t topic_len = (packet[t_index] << 8) | packet[t_index+1];
+	for(uint16_t i = 0; i < topic_len; i++){
+		topic += packet[4+i];
+		if(packet[4+i] == '/') depth++;
+	}
+	std::string value = "";
+	for(int i = 2+t_index+topic_len; i < packet.length(); i++){
+		value += packet[i];
+	}
+
+	int retval = -1;
+	for(int i = 0; i < tree_root->rowCount(); i++){
+		retval = update_topic(tree_root->item(i), topic, value, depth);
+		if(retval == 0) break;
+	}
+	if(retval == -1){
+		std::pair<std::string,std::string> path = getPath(topic);
+		std::string full_path = "";
+		QStandardItem* item = new QStandardItem(path.first.c_str());
+		if(depth == 0)
+			full_path += item->data(0).toString().toStdString();
+		else
+			full_path += item->data(0).toString().toStdString() + "/";
+		item->setData(false, 3);
+		item->setData(true, 4);
+		item->setData(QString::fromStdString(full_path), 7);
+		tree_root->appendRow(item);
+
+		for(int i = 1; i <= depth; i++){
+			path = getPath(path.second);
+			if(i == depth)
+				full_path += item->data(0).toString().toStdString();
+			else
+				full_path += item->data(0).toString().toStdString() + "/";
+			QStandardItem* new_level = new QStandardItem(path.first.c_str());
+			new_level->setData(false, 3);
+			new_level->setData(true, 4);
+			new_level->setData(QString::fromStdString(full_path), 7);
+			item->appendRow(new_level);
+			item = new_level;
+		}
+		item->setData(true, 3);
+		item->setData(true, 4);
+		item->setData(STRING, 5);
+		item->setData(QString::fromStdString(value), 6);
+		item->setData(QString::fromStdString(full_path), 7);
+		item->setForeground(QBrush(QColor(250,0,0)));
+	}
 }
