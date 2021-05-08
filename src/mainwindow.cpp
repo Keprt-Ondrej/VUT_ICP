@@ -164,7 +164,7 @@ void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index){
       */   
     } 
     else{      
-      ui->TopicTextView->setText("Data are BINARY, use Show in new window button");
+      ui->TopicTextView->setText("BINARY DATA, use Show in new window button");
       QByteArray data = index.data(6).toList().at(0).toByteArray(); 
       ShowBinaryDataWindow(data); 
     }

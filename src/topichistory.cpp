@@ -57,6 +57,8 @@ void TopicHistory::on_versions_doubleClicked(const QModelIndex &index)
         ui->topicTextView->setText(printData);
     }
     else{
-        ui->topicTextView->setText("DATA JSOU BINARNI");
+        QByteArray data = index.data(6).toByteArray();
+        ShowBinaryDataWindow(data);
+        ui->topicTextView->setText("BINARY DATA");
     }    
 }
