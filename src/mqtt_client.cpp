@@ -252,6 +252,7 @@ int MQTT_Client::mqtt_recv(int timeout){
 	/// Load an MQTT packet
 	/// Control header
 	retval = recv(tcp_socket, &c, 1, 0);
+	if(retval == 0) return -5;
 	if(retval < 0) return -4;
 	if(c >> 4 == 0){
 		broker_disconnect();
@@ -264,6 +265,7 @@ int MQTT_Client::mqtt_recv(int timeout){
 	uint32_t index = 0;
 	do{
 		retval = recv(tcp_socket, &c, 1, 0);
+		if(retval == 0) return -5;
 		if(retval < 0) return -4;
 		packet += c;
 		remaining_length |= (c&0x7F) << (index*7);
