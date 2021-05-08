@@ -3,6 +3,7 @@
 #include <unistd.h> // getpid, fcntl
 #include <fcntl.h>  // fcntl
 #include <iomanip>  // setw, internal, setfill; DELLETE LATER
+#include <iostream>
 
 // REWORK timeout on pending acks & resend
 
@@ -515,10 +516,16 @@ int update_topic(QStandardItem* item, std::string& name, std::string value, int 
   					item->appendRow(new_level);
   					item = new_level;
 				}
+				QList<QVariant> my_list;
+				QList<QVariant> my_list_types;
+
+				my_list.push_front(QString::fromStdString(value));
+				my_list_types.push_front(STRING);
+
 				item->setData(true, 3);
 				item->setData(true, 4);
-				item->setData(STRING, 5);
-				item->setData(QString::fromStdString(value), 6);
+				item->setData(my_list_types, 5);
+				item->setData(my_list, 6);
 				item->setData(QString::fromStdString(full_path), 7);
 				item->setForeground(QBrush(QColor(250,0,0)));
 				full_path.clear();
@@ -526,7 +533,8 @@ int update_topic(QStandardItem* item, std::string& name, std::string value, int 
 			}
 		}
 		else{
-			item->setData(QString::fromStdString(value), 6);
+			item->data(5).toList().push_front(STRING);
+			item->data(6).toList().push_front(QString::fromStdString(value));
 			item->setForeground(QBrush(QColor(250,0,0)));
 			return 0;
 		}
@@ -559,7 +567,7 @@ void MQTT_Client::update_tree(ustring& packet){
 		if(packet[4+i] == '/') depth++;
 	}
 	std::string value = "";
-	for(int i = 2+t_index+topic_len; i < packet.length(); i++){
+	for(unsigned int i = 2+t_index+topic_len; i < packet.length(); i++){
 		value += packet[i];
 	}
 
@@ -594,10 +602,17 @@ void MQTT_Client::update_tree(ustring& packet){
 			item->appendRow(new_level);
 			item = new_level;
 		}
+
+		QList<QVariant> my_list;
+		QList<QVariant> my_list_types;
+
+		my_list.push_front(QString::fromStdString(value));
+		my_list_types.push_front(STRING);
+
 		item->setData(true, 3);
 		item->setData(true, 4);
-		item->setData(STRING, 5);
-		item->setData(QString::fromStdString(value), 6);
+		item->setData(my_list_types, 5);
+		item->setData(my_list, 6);
 		item->setData(QString::fromStdString(full_path), 7);
 		item->setForeground(QBrush(QColor(250,0,0)));
 	}

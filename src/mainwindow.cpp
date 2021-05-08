@@ -16,13 +16,14 @@ MainWindow::MainWindow(MQTT_Client &mqtt,QWidget *parent) :
 {
   
   ui->setupUi(this);
-  this->setWindowTitle("MQTT EXPLORER");  
+  this->setWindowTitle("MQTT EXPLORER");
   //connectServerNewWindow();
 
   //https://stackoverflow.com/questions/1985936/creating-qt-models-for-tree-views
  
 
   QStandardItemModel* model = new QStandardItemModel(); 
+  sharedMqtt.set_tree_root(model);
 
   QStandardItem* item0 = new QStandardItem("1 first item");
   QStandardItem* item1 = new QStandardItem( "2 second item");

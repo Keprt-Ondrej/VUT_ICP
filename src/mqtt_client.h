@@ -2,10 +2,13 @@
 #define MQTT_CLIENT_H
 
 #include "tcp_client.h"
-#include "shared.h"
 #include <vector>
 #include <cstdint>
+#include <QStandardItemModel>
+#include <QStandardItem>
 #include <QtCore>
+#include <QtCore/QVariant>
+#include <QtWidgets/QTreeView>
 
 //enum data_type_t{JSON, STRING, BIN}
 
