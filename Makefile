@@ -16,7 +16,7 @@ clean:
 	rm -r -f $(SRC)*.o $(SRC)Makefile $(SRC)moc_* doc/* $(PROJECT) src/src.pro.user.* $(SRC)ui_*
 	
 pack: clean
-	zip -r $(ZIP) $(SRC) examples/ doc/ Makefile README.txt Doxyfile
+	zip -r $(ZIP) $(SRC) examples/ doc/ Makefile README.txt Doxyfile -x $(SRC).qmake.stash $(SRC).src.pro.user  
 
 doxygen:
 	doxygen 

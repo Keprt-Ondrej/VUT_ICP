@@ -86,21 +86,19 @@ void NewAndEditTopic::on_selectFile_released()
     using namespace std;
     string fileDataInput = fileName.toUtf8().constData();    
     streampos size;
-    ifstream file (fileDataInput, ios::in|ios::binary|ios::ate);
-    if (file.is_open()){
-        size = file.tellg();
-        //cout << size << endl;        
-        fileMemblock.resize(size);
-        file.seekg (0, ios::beg);
-        file.read (fileMemblock.data(), size);
-        file.close(); 
-        //cout << fileMemblock << endl;
-        ui->textData->setText("Data loaded from file:\n"+fileName);
-        ui->textData->setReadOnly(true);
-    }    
-    else{
+
+    ifstream file(fileDataInput);
+    if (!file.is_open()) {
         QMessageBox messageBox;
         messageBox.setFixedSize(700,200);
         messageBox.critical(0,"Error","Could not open file:\n"+fileName);
-    } 
+    }
+    else{
+        size = file.tellg();
+        fileMemblock.resize(size);
+        fileMemblock = string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        file.close(); 
+        ui->textData->setText("Data loaded from file:\n"+fileName);
+        ui->textData->setReadOnly(true);        
+    }
 }
