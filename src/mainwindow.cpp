@@ -25,10 +25,7 @@ MainWindow::MainWindow(MQTT_Client &mqtt, QWidget *parent) :
 {
 
     ui->setupUi(this);
-    this->setWindowTitle("MQTT EXPLORER");
-    //connectServerNewWindow();
-
-    //https://stackoverflow.com/questions/1985936/creating-qt-models-for-tree-views
+    this->setWindowTitle("MQTT EXPLORER");  
 
     QStandardItemModel *model = new QStandardItemModel();
     sharedMqtt.set_tree_root(model);
@@ -79,26 +76,12 @@ MainWindow::MainWindow(MQTT_Client &mqtt, QWidget *parent) :
     QStandardItem *vytahnutej = model->item(0);
     vytahnutej = vytahnutej->child(0);
 
-    /*
-  QVariant strQ = vytahnutej->data(0);
-  std::cout << "rowCount: "<<vytahnutej->rowCount() << std::endl;
-  std::string karel = strQ.toString().toStdString();
-  std::cout << "vytahnutej: " << karel << std::endl;
-*/
-
     ui->TreeView->setModel(model);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-void connectServerNewWindow(MQTT_Client &mqtt)
-{
-    ConnectServer connectServerWindow(mqtt);
-    connectServerWindow.setModal(true);
-    connectServerWindow.exec();
 }
 
 void MainWindow::on_actionConnect_server_triggered()
@@ -109,20 +92,10 @@ void MainWindow::on_actionConnect_server_triggered()
 void MainWindow::on_actionNew_Topic_triggered()
 {
     NewAndEditTopic NT(sharedMqtt, nullptr);
-    //qInfo() << NT;
     NT.setModal(false);
     NT.setWindowFlags(Qt::Window);
     NT.setWindowTitle("New topic");
     NT.exec();
-}
-
-void ShowBinaryDataWindow(QByteArray &data)
-{
-    ShowBinaryData ShowBinaryDataWindow(data);
-    ShowBinaryDataWindow.setModal(true);
-    ShowBinaryDataWindow.setWindowFlags(Qt::Window);
-    ShowBinaryDataWindow.setWindowTitle("Binary Data");
-    ShowBinaryDataWindow.exec();
 }
 
 void MainWindow::on_TopicShowInNewWindow_released()
@@ -195,7 +168,7 @@ void MainWindow::on_TopicEdit_released()
 void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index)
 {
     if (index.data(3).toBool())
-    { //je topic
+    { //is topic
         displayedData = const_cast<QModelIndex &>(index);
         QString stringData = "";
         /*data_type_t*/ int type = index.data(5).toList().at(0).toInt();
@@ -203,12 +176,12 @@ void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index)
         {
             ui->TopicTextView->setText(index.data(6).toList().at(0).toString());
             /*   
-      or this way:
-      QVariant raw = index.data(6);
-      QList<QVariant> data = raw.toList();      
-      stringData = stringData + data.at(0).toString(); 
-      ui->TopicTextView->setText(stringData);
-      */
+                or this way:
+                QVariant raw = index.data(6);
+                QList<QVariant> data = raw.toList();      
+                stringData = stringData + data.at(0).toString(); 
+                ui->TopicTextView->setText(stringData);
+            */
         }
         else
         {
@@ -218,7 +191,6 @@ void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index)
         }
     }
 }
-//https://www.youtube.com/watch?v=M0PZDrDwdHM  tree directory
 
 void MainWindow::on_actionDashboard_triggered()
 {

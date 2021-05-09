@@ -53,4 +53,12 @@ private slots:
     void connectToServer();
 };
 
+/**
+ * @brief Open new window to select new server
+ * 
+ * @param mqtt shared data
+ * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+*/
+void connectServerNewWindow(MQTT_Client &mqtt);
+
 #endif // CONNECTSERVER_H

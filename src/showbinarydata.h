@@ -43,4 +43,14 @@ private:
     QByteArray &data;       ///< Reference to binary data
 };
 
+/**
+ * @brief Display binary data in new window
+ * 
+ * @sa Class for window ShowBinaryData
+ * 
+ * @param data reference to data, which should be displayed
+ * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+*/
+void ShowBinaryDataWindow(QByteArray &data);
+
 #endif // SHOWBINARYDATA_H

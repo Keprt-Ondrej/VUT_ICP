@@ -23,3 +23,12 @@ ShowBinaryData::~ShowBinaryData()
 {
     delete ui;
 }
+
+void ShowBinaryDataWindow(QByteArray &data)
+{
+    ShowBinaryData ShowBinaryDataWindow(data);
+    ShowBinaryDataWindow.setModal(true);
+    ShowBinaryDataWindow.setWindowFlags(Qt::Window);
+    ShowBinaryDataWindow.setWindowTitle("Binary Data");
+    ShowBinaryDataWindow.exec();
+}

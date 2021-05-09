@@ -112,22 +112,4 @@ private slots:
     void on_actionDashboard_triggered();
 };
 
-/**
- * @brief Display binary data in new window
- * 
- * @sa Class for window ShowBinaryData
- * 
- * @param data reference to data, which should be displayed
- * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
-*/
-void ShowBinaryDataWindow(QByteArray &data);
-
-/**
- * @brief Open new window to select new server
- * 
- * @param mqtt shared data
- * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
-*/
-void connectServerNewWindow(MQTT_Client &mqtt);
-
 #endif // MAINWINDOW_H

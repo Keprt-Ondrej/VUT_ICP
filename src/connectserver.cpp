@@ -60,3 +60,10 @@ void ConnectServer::connectToServer()
     ///< \todo dodelat switch na ruzne error msg
     messageBox.critical(0, "Error", "An error has occured!");
 }
+
+void connectServerNewWindow(MQTT_Client &mqtt)
+{
+    ConnectServer connectServerWindow(mqtt);
+    connectServerWindow.setModal(true);
+    connectServerWindow.exec();
+}
