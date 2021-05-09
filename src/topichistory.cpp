@@ -1,3 +1,10 @@
+/**
+ * @file topichistory.cpp
+ * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+ * 
+ * @brief Definition of class for displaying topic history in new window
+ * 
+*/
 #include "topichistory.h"
 #include "ui_topichistory.h"
 #include "mainwindow.h"
@@ -8,8 +15,7 @@ TopicHistory::TopicHistory(QModelIndex &dataHistory,QWidget *parent) :
     ui(new Ui::TopicHistory),
     dataHistory(dataHistory)
 {  
-    ui->setupUi(this);
-    qInfo() << dataHistory.data(0);    //TODO SMAZAT    
+    ui->setupUi(this);   
     
     QStandardItemModel* model = new QStandardItemModel();     
     ui->path->setText(dataHistory.data(7).toString());

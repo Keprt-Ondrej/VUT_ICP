@@ -52,6 +52,8 @@ public:
 private slots:
     /**
      * @brief Open new window, where user can publish topic
+     * @sa Class NewAndEditTopic for window class
+     * @note Same window for edit topic
      * 
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
@@ -59,8 +61,7 @@ private slots:
 
     /**
      * @brief Open displayed topic concetent in new window
-     * @note Same window for edit topic
-     * @sa class NewAndEditTopic for window class
+     * @sa Class for window  fullTextWindow
      * 
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
@@ -69,6 +70,8 @@ private slots:
     /**
      * @brief Open history of displayed topic in new window
      * 
+     * @sa Class for window ShowBinaryData
+     * 
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
     void on_TopicHistory_released();
@@ -76,8 +79,8 @@ private slots:
     /**
      * @brief Open displayed topic in edit window
      * 
-     * @note Same window for new topic, with filled data from topic
      * @sa class NewAndEditTopic for window class
+     * @note Same window for new topic, with filled data from topic
      *
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
@@ -111,6 +114,8 @@ private slots:
 
 /**
  * @brief Display binary data in new window
+ * 
+ * @sa Class for window ShowBinaryData
  * 
  * @param data reference to data, which should be displayed
  * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)

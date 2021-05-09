@@ -1,3 +1,11 @@
+/**
+ * @file main.cpp
+ * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+ * @author Fabo Matúš (xfabom01@stud.fit.vutbr.cz)
+ * 
+ * @brief 
+ * 
+*/
 
 #include <iostream>
 #include <fstream>

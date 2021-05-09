@@ -1,11 +1,18 @@
+/**
+ * @file newandedittopic.cpp
+ * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+ * 
+ * @brief Definition of class for editing or publishing new topic
+ * 
+*/
+
 #include "newandedittopic.h"
-#include "ui_newandedittopic.h"
-#include <QFileDialog>
+#include <QFileDialog>  ///< \todo delete
 #include <QDebug>
 #include <iostream>
-#include <fstream>
-#include <QMessageBox>
+#include <QMessageBox>  
 #include "mqtt_client.h"
+#include <fstream>
 
 NewAndEditTopic::NewAndEditTopic(MQTT_Client &mqtt,QWidget *parent) :    
     QDialog(parent),

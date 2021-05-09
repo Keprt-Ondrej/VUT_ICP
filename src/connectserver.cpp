@@ -28,6 +28,7 @@ ConnectServer::~ConnectServer()
 
 void ConnectServer::connectToServer()
 {
+    // get data from GUI
     QString protocolQS = ui->Protocol->currentText();
     std::string protocol = protocolQS.toUtf8().constData();
     QString hostQS = ui->Host->text();
@@ -37,6 +38,7 @@ void ConnectServer::connectToServer()
     std::string username = usernameQS.toUtf8().constData();
     QString passwordQS = ui->Password->text();
     std::string password = passwordQS.toUtf8().constData();
+
     client_t info{
         host,
         port,
@@ -44,16 +46,17 @@ void ConnectServer::connectToServer()
         password,
         "" //client_id
     };
-    int result = mqtt.broker_connect(info);
+
+    int result = mqtt.broker_connect(info); //connect to new server
 
     if (result == 0)
     {
-        close(); //uspech, zavrit okno
+        close(); //succes, close window
     }
 
-    //neuspech:
+    //fail to connect
     QMessageBox messageBox;
     messageBox.setFixedSize(500, 200);
-    //TODO dodelat switch na ruzne error msg
+    ///< \todo dodelat switch na ruzne error msg
     messageBox.critical(0, "Error", "An error has occured!");
 }

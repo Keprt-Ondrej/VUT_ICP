@@ -1,7 +1,11 @@
+/**
+ * @file showbinarydata.cpp
+ * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+ * 
+ * @brief Definition of class for displaying binary data in new window
+ * 
+*/
 #include "showbinarydata.h"
-#include "ui_showbinarydata.h"
-#include <QDebug>
-#include <QFile>    //TODO SMAZAT
 
 ShowBinaryData::ShowBinaryData(QByteArray &data,QWidget *parent) :
     QDialog(parent),
@@ -9,14 +13,6 @@ ShowBinaryData::ShowBinaryData(QByteArray &data,QWidget *parent) :
     data(data)
 {
     ui->setupUi(this);
-/*
-    QFile CurrentFile("examples/cats.jpg");
-    if(!CurrentFile.open(QIODevice::ReadOnly)) return;
-    QByteArray DataFile = CurrentFile.readAll();
-    //QPixmap pix("examples/cats.jpg");
-    QPixmap pix(DataFile.size(),1);
-    pix.loadFromData(DataFile);     
-*/
     
     QPixmap pix(data.size(),1);
     pix.loadFromData(data);

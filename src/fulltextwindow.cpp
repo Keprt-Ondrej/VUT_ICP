@@ -1,15 +1,20 @@
-#include "fulltextwindow.h"
-#include "ui_fulltextwindow.h"
+/**
+ * @file fulltextwindow.cpp
+ * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+ * 
+ * @brief Definition of class for displaying text data in new window
+ * 
+*/
 
-fullTextWindow::fullTextWindow(QString &data,QString &path,QWidget *parent) :
+#include "fulltextwindow.h"
+
+fullTextWindow::fullTextWindow(QString &data, QString &path, QWidget *parent):
     QDialog(parent),
-    ui(new Ui::fullTextWindow),
-    data(data),
-    path(path)
+    ui(new Ui::fullTextWindow)    
 {
     ui->setupUi(this);
     ui->topic->setText(data);
-    ui->topicPath->setText(path); 
+    ui->topicPath->setText(path);
 }
 
 fullTextWindow::~fullTextWindow()
