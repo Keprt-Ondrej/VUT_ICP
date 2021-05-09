@@ -17,10 +17,11 @@
 
 QModelIndex dEfAuLTgLOBAlInDeX = QModelIndex();
 
-MainWindow::MainWindow(MQTT_Client &mqtt, QWidget *parent) : QMainWindow(parent),
-                                                             ui(new Ui::MainWindow),
-                                                             displayedData(dEfAuLTgLOBAlInDeX),
-                                                             sharedMqtt(mqtt)
+MainWindow::MainWindow(MQTT_Client &mqtt, QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow),
+    displayedData(dEfAuLTgLOBAlInDeX),
+    sharedMqtt(mqtt)
 {
 
     ui->setupUi(this);
