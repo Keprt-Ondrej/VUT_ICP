@@ -48,8 +48,8 @@ int main(int argc, char *argv[]) {
 	/// Set up client info
 	MQTT_Client mqtt;	
 	client_t data = {
-		"127.0.0.1",
-        6969,
+		"test.mosquitto.org",
+        1883,
         "",
         "",
         ""
