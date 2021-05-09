@@ -142,7 +142,6 @@ int MQTT_Client::publish(const std::string& topic, const std::string& value, pub
 	}
 
 	/// Create payload
-	INSERT_2B_LEN(value.length(), publish_packet);
 	publish_packet += value;
 
 	/// Send the packet
