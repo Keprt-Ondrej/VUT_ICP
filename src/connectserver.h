@@ -46,12 +46,12 @@ private slots:
     /**
      * @brief Connect app to new server
      * 
-     * @sa broker_connect
+     * @sa call function broker_connect
      * @todo rename function
      * 
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
-    void storeConnectionInfo();
+    void connectToServer();
 };
 
 #endif // CONNECTSERVER_H

@@ -18,7 +18,7 @@ ConnectServer::ConnectServer(MQTT_Client &mqtt, QWidget *parent):
     //this->setAttribute( Qt::WA_DeleteOnClose);
     ui->setupUi(this);
     this->setWindowTitle("Connect server");
-    connect(ui->Connect, SIGNAL(released()), this, SLOT(storeConnectionInfo()));
+    connect(ui->Connect, SIGNAL(released()), this, SLOT(connectToServer()));
 }
 
 ConnectServer::~ConnectServer()
@@ -26,7 +26,7 @@ ConnectServer::~ConnectServer()
     delete ui;
 }
 
-void ConnectServer::storeConnectionInfo()
+void ConnectServer::connectToServer()
 {
     QString protocolQS = ui->Protocol->currentText();
     std::string protocol = protocolQS.toUtf8().constData();
