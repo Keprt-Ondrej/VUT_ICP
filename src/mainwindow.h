@@ -49,6 +49,9 @@ public:
     QModelIndex &displayedData; ///< brief Index to data storage, that are now displayed
     MQTT_Client &sharedMqtt;    ///< reference to application data
 
+private:
+    QStandardItemModel* tree_model;
+
 private slots:
     /**
      * @brief Open new window, where user can publish topic

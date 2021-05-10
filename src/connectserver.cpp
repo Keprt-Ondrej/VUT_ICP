@@ -9,6 +9,7 @@
 #include "connectserver.h"
 #include "mqtt_client.h"
 #include <QMessageBox>
+#include <iostream>
 
 ConnectServer::ConnectServer(MQTT_Client &mqtt, QWidget *parent):
     QDialog(parent),
@@ -51,14 +52,42 @@ void ConnectServer::connectToServer()
 
     if (result == 0)
     {
-        close(); //succes, close window
+        result = mqtt.mqtt_recv(10); //wait 10 seconds for connection acknowledge
+        if(result == 0){
+            bool success = true;
+            result = mqtt.start_receiving();
+            std::cout << "Thread: " << result << std::endl;
+            if(result != 0)
+            {
+                success = false;
+            }
+
+            result = mqtt.subscribe("$SYS/#");
+            std::cout << "SYS subscribe: " << result << std::endl;
+            if(result != 0)
+            {
+                success = false;
+            }
+
+            result = mqtt.subscribe("#");
+            std::cout << "Everything subscribe: " << result << std::endl;
+            if(result != 0)
+            {
+                success = false;
+            }
+
+            if(success){
+                close(); //success, close window
+                return;
+            }
+        }
     }
 
     //fail to connect
     QMessageBox messageBox;
     messageBox.setFixedSize(500, 200);
     ///< \todo dodelat switch na ruzne error msg
-    messageBox.critical(0, "Error", "An error has occured!");
+    messageBox.critical(0, "Error", "Broker connection failed!");
 }
 
 void connectServerNewWindow(MQTT_Client &mqtt)

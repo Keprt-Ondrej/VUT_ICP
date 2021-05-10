@@ -282,11 +282,6 @@ int MQTT_Client::mqtt_recv(int timeout){
 	retval = recv(tcp_socket, &c, 1, 0);
 	if(retval == 0) return -5;
 	if(retval < 0) return -4;
-	if(c >> 4 == 0){
-		broker_disconnect();
-		tcp_receive(10);
-		return -5;
-	}
 	packet += c;
 
 	/// Remaining length
@@ -305,15 +300,14 @@ int MQTT_Client::mqtt_recv(int timeout){
 		retval = recv(tcp_socket, &c, 1, 0);
 		if(retval == 0) return -5;
 		if(retval < 0){
-			return retval-10;
+			return retval-20;
 		}
 		packet += c;
 	}
 
 	/// Do something with the data
 	received_data(packet);
-
-	//usleep(1000);	
+	
 	return 0;
 }
 
@@ -374,6 +368,7 @@ QModelIndex MQTT_Client::topic_find(std::string& topic){
 }
 
 void continuous_receive(MQTT_Client& client){
+	std::cout << "Started listening\n";
 	int retval;
 	time_t last_ping = time(0);
 	while(client.get_connected()){
@@ -391,17 +386,19 @@ void continuous_receive(MQTT_Client& client){
 }
 
 int MQTT_Client::start_receiving(){
+	if(receiving_thread.joinable())
+		return -1;
+
+	receiving_thread = std::thread(continuous_receive, std::ref(*this));
+	return 0;
+}
+
+int MQTT_Client::stop_receiving(){
 	if(receiving_thread.joinable() == false)
 		return -1;
 
 	receiving_thread.join();
-}
-
-int MQTT_Client::stop_receiving(){
-	if(!receiving_thread.joinable())
-		return -1;
-
-	receiving_thread = std::thread(continuous_receive, std::ref(*this));
+	return 0;
 }
 
 uint32_t MQTT_Client::to_remaining_len(uint32_t rem_len){
@@ -615,6 +612,7 @@ data_type_t data_type(std::string& data){
 }
 
 int update_topic(QStandardItem* item, std::string& name, std::string value, int depth){
+	usleep(5);
 	if(item == NULL || depth < 0) return -1;
 	std::pair<std::string,std::string> path = getPath(name);
 	static std::string full_path = "";

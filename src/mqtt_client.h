@@ -64,6 +64,7 @@ class MQTT_Client : private TCP_Client{
 		bool get_connected();
 		QModelIndex topic_find(std::string& topic);
 		int start_receiving();
+		int stop_receiving();
 
 	private:
 		uint32_t to_remaining_len(uint32_t rem_len);

@@ -29,8 +29,8 @@ MainWindow::MainWindow(MQTT_Client &mqtt, QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("MQTT EXPLORER");  
 
-    QStandardItemModel *model = new QStandardItemModel();
-    sharedMqtt.set_tree_root(model);
+    tree_model = new QStandardItemModel();
+    sharedMqtt.set_tree_root(tree_model);
 
     QStandardItem *item0 = new QStandardItem("koren");
     QStandardItem *item1 = new QStandardItem("2 second item");
@@ -69,16 +69,16 @@ MainWindow::MainWindow(MQTT_Client &mqtt, QWidget *parent) :
     item4->setForeground(QBrush(sendColor));
     item4->setData("/karel/sel/na/pomoc/do/bytu", 7);
 
-    model->appendRow(item0);
+    tree_model->appendRow(item0);
     item0->appendRow(item3);
     //item0->appendRow(item9);
     item0->appendRow(item4);
-    model->appendRow(item1);
+    tree_model->appendRow(item1);
 
-    QStandardItem *vytahnutej = model->item(0);
+    QStandardItem *vytahnutej = tree_model->item(0);
     vytahnutej = vytahnutej->child(0);
 
-    ui->TreeView->setModel(model);
+    ui->TreeView->setModel(tree_model);
 }
 
 MainWindow::~MainWindow()
@@ -89,6 +89,10 @@ MainWindow::~MainWindow()
 void MainWindow::on_actionConnect_server_triggered()
 {
     connectServerNewWindow(sharedMqtt);
+    
+    tree_model = new QStandardItemModel();
+    sharedMqtt.set_tree_root(tree_model);
+    ui->TreeView->setModel(tree_model);
 }
 
 void MainWindow::on_actionNew_Topic_triggered()
