@@ -10,7 +10,7 @@
 #include <QTextBrowser>
 
 
-// REWORK timeout on pending acks & resend\
+// REWORK timeout on pending acks & resend
 
 #define INSERT_REM_LEN(len, packet)            \
 	while(len != 0){                           \
@@ -142,6 +142,9 @@ int MQTT_Client::broker_disconnect(){
 		char ping_packet[] = {static_cast<char>(DISCONNECT << 4), 0};
 		int retval = tcp_send(ping_packet, 2);
 		if(retval) return retval;
+		if(tree_root != NULL){
+			delete_tree(NULL);
+		}
 	}
 
 	return 0;
@@ -723,5 +726,29 @@ void MQTT_Client::update_tree(ustring& packet){
 		item->setData(my_list, 6);
 		item->setData(QString::fromStdString(full_path), 7);
 		item->setForeground(QBrush(QColor(250,0,0)));
+	}
+}
+
+void MQTT_Client::delete_tree(QStandardItem* item){
+	if(item == NULL){
+		if(tree_root == NULL) return;
+		for(int i = 0; i < tree_root->rowCount(); i++){
+			delete_tree(tree_root->item(i));
+		}
+		delete tree_root;
+		tree_root = NULL;
+	}
+	else{
+		if(item->rowCount() == 0){
+			delete item;
+			return;
+		}
+		else{
+			for(int i = 0; i < item->rowCount(); i++){
+				delete_tree(item->child(i));
+			}
+			delete item;
+			return;
+		}
 	}
 }
