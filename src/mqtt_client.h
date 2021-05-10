@@ -10,6 +10,7 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QTreeView>
 #include <QHBoxLayout>
+#include "dashboard.h"
 
 //enum data_type_t{JSON, STRING, BIN}
 
@@ -62,16 +63,9 @@ class MQTT_Client : private TCP_Client{
 		void set_tree_root(QStandardItemModel* root);
 		bool get_connected();
 		QModelIndex topic_find(std::string& topic);
-
-        /**
-         * @brief Update data displayed in GUI
-         * 
-         * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
-        */
-        void updateGUI();
-
-        QHash<QModelIndex,QHBoxLayout*> mapDataToDisplay;
+        
         bool dashBoardOpened = false;
+        DashBoard *dashBoardGUI;
 
 	private:
 		uint32_t to_remaining_len(uint32_t rem_len);

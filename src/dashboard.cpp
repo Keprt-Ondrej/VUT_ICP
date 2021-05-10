@@ -11,6 +11,7 @@
 #include <QSpacerItem>
 #include <QMessageBox>
 #include <string>   
+#include <QLineEdit> 
 
 DashBoard::DashBoard(MQTT_Client &mqtt,QWidget *parent) :
     QDialog(parent),
@@ -20,6 +21,14 @@ DashBoard::DashBoard(MQTT_Client &mqtt,QWidget *parent) :
 {
     ui->setupUi(this);   
     layout = qobject_cast<QVBoxLayout*>(ui->widgets_frame->layout());
+
+    mqtt.dashBoardGUI = this;
+
+    mojelajna = new QLineEdit("Konec",nullptr);
+    mojelajna->setObjectName("mojelajna");
+    layout->addWidget(mojelajna);
+
+   
 }
 
 DashBoard::~DashBoard()
@@ -54,7 +63,7 @@ void DashBoard::on_addWidget_released()
     QHBoxLayout *newWidget = new QHBoxLayout(nullptr); 
 
     QLabel *icon = new QLabel("Teplomeros",nullptr);    
-    //icon->setMaximumSize(100,100);
+    icon->setMaximumSize(150,150);
     if (widgetType == "temperature"){
         icon->setPixmap(thermometherPNG);
     }
@@ -94,14 +103,15 @@ void DashBoard::on_addWidget_released()
     button->setMaximumSize(120,30);
     mapButtonToLayout.insert(button,newWidget);     //for proper deleting all widgets
     newWidget->addWidget(button);
-    //mqtt.mapDataToDisplay.insert    
+    mapDataToDisplay.insert(dataIndex,newWidget);    
 
     layout->insertLayout(0,newWidget);  
-
     
-        foreach (QPushButton* item,mapButtonToLayout.keys()){
-            qInfo() << item << mapButtonToLayout.value(button);
-        } 
+    QVariant num = layout->count();
+    mojelajna->setText(num.toString());
+    foreach (QPushButton* item,mapButtonToLayout.keys()){
+        qInfo() << item << mapButtonToLayout.value(button);
+    } 
     
 }
 
@@ -123,3 +133,17 @@ void DashBoard::removeWidget()
     delete removeLayout;  
     
 }
+
+void DashBoard::updateGUI(){
+    foreach (QModelIndex dataIndex,mapDataToDisplay.keys()){
+        QHBoxLayout* widgetCluster = mapDataToDisplay.value(dataIndex);
+        QTextBrowser* dataDisplay = qobject_cast<QTextBrowser*>(widgetCluster->itemAt(2)->widget());
+        int type = dataIndex.data(5).toList().at(0).toInt();
+        if (type == BIN){
+            dataDisplay->setText("Cannot display binnary data");
+        }
+        else{
+            dataDisplay->setText(dataIndex.data(6).toList().at(0).toString());
+        }
+    }
+}  

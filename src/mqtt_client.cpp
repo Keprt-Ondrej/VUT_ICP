@@ -8,6 +8,7 @@
 
 #include <QTextBrowser>
 
+
 // REWORK timeout on pending acks & resend\
 // REWORK check if received remaining length is calculated well
 
@@ -473,6 +474,11 @@ int MQTT_Client::received_data(ustring& received_packet){
 			std::cout << "PUBLISH arrived.\n";
 			qos = (received_packet[0]&0b0110) >> 1;
 			update_tree(received_packet);
+
+            if (dashBoardOpened){
+                dashBoardGUI->updateGUI();
+            }
+
 			if(qos != 0){
 				uint16_t tmp_len = (received_packet[2] << 8) | received_packet[3];
 				packet_id = (received_packet[2+tmp_len] << 8) | received_packet[3+tmp_len];
@@ -702,25 +708,4 @@ void MQTT_Client::update_tree(ustring& packet){
 		item->setData(QString::fromStdString(full_path), 7);
 		item->setForeground(QBrush(QColor(250,0,0)));
 	}
-}
-
-
-void MQTT_Client::updateGUI(){
-    if(dashBoardOpened){
-        foreach (QModelIndex dataIndex,mapDataToDisplay.keys()){
-            QHBoxLayout* widgetCluster = mapDataToDisplay.value(dataIndex);
-            QTextBrowser* dataDisplay = qobject_cast<QTextBrowser*>(widgetCluster->itemAt(2)->widget());
-            int type = dataIndex.data(5).toList().at(0).toInt();
-            if (type == BIN){
-                dataDisplay->setText("Cannot display binnary data");
-            }
-            else{
-                dataDisplay->setText(dataIndex.data(6).toList().at(0).toString());
-            }
-        }  
-    }
-    else{
-        std::cout << "No dashboard\n"; 
-        ///\todo update main window
-    }
 }

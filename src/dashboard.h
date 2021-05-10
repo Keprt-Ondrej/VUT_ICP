@@ -6,10 +6,6 @@
 #include <QHash>
 class MQTT_Client; // forward declaration for proper compiling
 
-namespace Ui {
-class DashBoard;
-}
-
 class DashBoard : public QDialog
 {
     Q_OBJECT
@@ -17,6 +13,14 @@ class DashBoard : public QDialog
 public:
     explicit DashBoard(MQTT_Client &mqtt,QWidget *parent = nullptr);
     ~DashBoard();
+
+public slots:
+    /**
+     * @brief Update data displayed in GUI
+     * 
+     * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+    */
+    void updateGUI();        
 
 private slots:
     void on_addWidget_released();
@@ -28,6 +32,8 @@ private:
     QHash<QPushButton*,QHBoxLayout*> mapButtonToLayout; 
     QPixmap thermometherPNG;
     MQTT_Client &mqtt;
+    QHash<QModelIndex,QHBoxLayout*> mapDataToDisplay;
+    QLineEdit * mojelajna;
 };
 
 #endif // DASHBOARD_H
