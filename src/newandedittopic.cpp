@@ -64,6 +64,7 @@ void NewAndEditTopic::on_publish_released()
         qualityOfService,   //uint8_t QoS;  Quality of Service
         retainOnServer      //bool retain;  Store on server store
     };
+    
     int result = mqtt.publish(path, fileMemblock, flags);
     if(result == 0){ 
         QMessageBox messageBox;

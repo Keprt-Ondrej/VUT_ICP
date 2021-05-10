@@ -12,8 +12,10 @@
 #include "showbinarydata.h"
 #include "fulltextwindow.h"
 #include "newandedittopic.h"
+#include "dashboard.h"
 #include <QMessageBox>
 #include <iostream>
+
 
 QModelIndex dEfAuLTgLOBAlInDeX = QModelIndex();
 
@@ -169,6 +171,7 @@ void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index)
 {
     if (index.data(3).toBool())
     { //is topic
+        qInfo() << index.data(0) << "\t" << index.data(2);
         displayedData = const_cast<QModelIndex &>(index);
         QString stringData = "";
         /*data_type_t*/ int type = index.data(5).toList().at(0).toInt();
@@ -195,7 +198,9 @@ void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index)
 void MainWindow::on_actionDashboard_triggered()
 {
     //DASHBOARD
-    QMessageBox messageBox;
-    messageBox.setFixedSize(500, 200);
-    messageBox.critical(0, "Error", "Not implemented");
+    DashBoard dashBoard(sharedMqtt,nullptr);
+    dashBoard.setModal(true);
+    dashBoard.setWindowFlags(Qt::Window);
+    dashBoard.setWindowTitle("Dash Board");
+    dashBoard.exec();
 }

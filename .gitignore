@@ -24,3 +24,5 @@ src/ui_newEditTopic.h
 src/ui_newandedittopic.h
 src/moc_newandedittopic.cpp
 1-xfabom01-xkeprt03.zip
+src/ui_dashboard.h
+src/moc_dashboard.cpp

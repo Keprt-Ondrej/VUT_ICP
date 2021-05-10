@@ -20,6 +20,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         connectserver.cpp \
+        dashboard.cpp \
         fulltextwindow.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -31,6 +32,7 @@ SOURCES += \
 
 HEADERS += \
         connectserver.h \
+        dashboard.h \
         fulltextwindow.h \
         mainwindow.h \
         newandedittopic.h \
@@ -42,6 +44,7 @@ HEADERS += \
 
 FORMS += \
         connectserver.ui \
+        dashboard.ui \
         fulltextwindow.ui \
         mainwindow.ui \
         newandedittopic.ui \
