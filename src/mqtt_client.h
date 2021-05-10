@@ -60,6 +60,7 @@ class MQTT_Client : private TCP_Client{
 		int mqtt_recv(int timeout);
 		void set_tree_root(QStandardItemModel* root);
 		bool get_connected();
+		QModelIndex topic_find(std::string& topic);
 
 	private:
 		uint32_t to_remaining_len(uint32_t rem_len);

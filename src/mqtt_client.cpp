@@ -5,7 +5,8 @@
 #include <iomanip>  // setw, internal, setfill; DELLETE LATER
 #include <iostream>
 
-// REWORK timeout on pending acks & resend
+// REWORK timeout on pending acks & resend\
+// REWORK check if received remaining length is calculated well
 
 #define INSERT_REM_LEN(len, packet)            \
 	while(len != 0){                           \
@@ -30,6 +31,26 @@ MQTT_Client::MQTT_Client(client_t info)
 MQTT_Client::~MQTT_Client(){
 	int retval = broker_disconnect();
 	if(retval) std::cerr << "Broker already disconnected : " << retval << std::endl;
+}
+
+void _print_packet(const uint8_t* received_packet, int size){
+	std::string tmp_buf = "";
+			std::cout << tmp_buf << std::endl;
+	for(int i = 0; i < size; i++){
+		if(i%8 == 0){
+			std::cout << tmp_buf << std::endl;
+			tmp_buf.clear();
+		}
+		std::cout << std::internal << std::setfill('0');
+		std::cout << std::hex << std::setw(2) << static_cast<uint16_t>(received_packet[i]) << " ";
+		if(received_packet[i] >= 32) tmp_buf += received_packet[i];
+		else tmp_buf += '.';
+	}
+	std::cout << std::dec << std::endl;
+}
+template<typename T>
+void print_packet(std::basic_string<T>& tmp){
+	_print_packet(reinterpret_cast<const uint8_t*>(tmp.c_str()), tmp.size());
 }
 
 int MQTT_Client::broker_connect(client_t info){
@@ -107,10 +128,10 @@ int MQTT_Client::broker_connect(client_t info){
 int MQTT_Client::broker_disconnect(){
 	/// Send disconnect nofification
 	if(connected){
+		connected = false;
 		char ping_packet[] = {static_cast<char>(DISCONNECT << 4), 0};
 		int retval = tcp_send(ping_packet, 2);
 		if(retval) return retval;
-		connected = false;
 	}
 
 	return 0;
@@ -124,8 +145,8 @@ int MQTT_Client::publish(const std::string& topic, const std::string& value, pub
 	uint32_t remaining_length = 0;
 	std::string publish_packet;
 
-	if(opt.QoS != 0) remaining_length = to_remaining_len(6+topic.length()+value.length()); // 2+2+2 bytes for topic, packet identifier and payload lengths + the actual data
-	else             remaining_length = to_remaining_len(4+topic.length()+value.length()); // Same as ^ , but no packet identifier
+	if(opt.QoS != 0) remaining_length = to_remaining_len(4+topic.length()+value.length()); // 2+2+2 bytes for topic, packet identifier and payload lengths + the actual data
+	else             remaining_length = to_remaining_len(2+topic.length()+value.length()); // Same as ^ , but no packet identifier
 
 	/// Create fixed header
 	publish_packet = static_cast<char>((PUBLISH << 4) | (opt.DUP << 3) | ((opt.QoS&0b11) << 1) | (opt.retain&1));
@@ -180,7 +201,7 @@ int MQTT_Client::subscribe(const std::string& topic){
 	if(retval) return retval-10;
 
 	/// Expect SUBACK to arrive
-	add_ack(std::make_tuple(SUBACK, 0));
+	add_ack(std::make_tuple(SUBACK, packet_id));
 
 	return 0;
 }
@@ -208,7 +229,7 @@ int MQTT_Client::unsubscribe(const std::string& topic){
 	if(retval) return retval-10;
 
 	/// Expect UNSUBACK to arrive
-	add_ack(std::make_tuple(UNSUBACK, 0));
+	add_ack(std::make_tuple(UNSUBACK, packet_id));
 
 	return 0;
 }
@@ -259,7 +280,6 @@ int MQTT_Client::mqtt_recv(int timeout){
 		return -5;
 	}
 	packet += c;
-
 	/// Remaining length
 	uint32_t index = 0;
 	do{
@@ -289,6 +309,54 @@ void MQTT_Client::set_tree_root(QStandardItemModel* root){
 
 bool MQTT_Client::get_connected(){
 	return connected;
+}
+
+std::pair<std::string,std::string> getPath(std::string path){
+	std::string delimiter = "/";
+	std::string name = path.substr(0, path.find(delimiter));
+	path.erase(0, path.find(delimiter) + delimiter.length());
+	return std::make_pair(name, path);
+}
+
+QModelIndex _topic_find(QStandardItem* item, std::string& topic){
+	QModelIndex blank = QModelIndex();
+	if(item == NULL) return blank;
+
+	std::pair<std::string,std::string> path = getPath(topic);
+	if(path.first != item->data(0).toString().toStdString())
+		return blank;
+
+	static std::string current_path = "";
+
+	if(item->rowCount() == 0){
+		//std::cout << current_path << item->data(0).toString().toStdString() << std::endl;
+		return item->index();
+	}
+
+	current_path += path.first + '/';
+
+	QModelIndex tmp;
+	for(int i = 0; i < item->rowCount(); i++){
+		tmp = _topic_find(item->child(i), path.second);
+		if(tmp != blank){
+			current_path.clear();
+			return tmp;
+		}
+	}
+	current_path.erase(current_path.end()-item->data(0).toString().size()-1, current_path.end());
+	return blank;
+}
+
+QModelIndex MQTT_Client::topic_find(std::string& topic){
+	QModelIndex blank = QModelIndex();
+	QModelIndex tmp;
+	for(int i = 0; i < tree_root->rowCount(); i++){
+		tmp = _topic_find(tree_root->item(i), topic);
+		if(tmp != blank){
+			return tmp;
+		}
+	}
+	return blank;
 }
 
 uint32_t MQTT_Client::to_remaining_len(uint32_t rem_len){
@@ -463,12 +531,7 @@ int MQTT_Client::received_data(ustring& received_packet){
 		default:{
 			static int count = 0;
 			std::cout << "Oh no, anyway...(" << (received_packet[0]>>4) << "): " << count++ << " times.\n";
-			for(unsigned int i = 0; i < received_packet.size(); i++){
-				if(i%8 == 0) std::cout << std::endl;
-				std::cout << std::internal << std::setfill('0');
-				std::cout << std::hex << std::setw(2) << static_cast<unsigned int>(received_packet[i]) << " ";
-			}
-			std::cout << std::dec << std::endl;
+			print_packet<uint8_t>(received_packet);
 		}
 	}
 
@@ -480,13 +543,6 @@ int MQTT_Client::received_data(ustring& received_packet){
 	std::cout << std::endl;
 
 	return 0;
-}
-
-std::pair<std::string,std::string> getPath(std::string path){
-	std::string delimiter = "/";
-	std::string name = path.substr(0, path.find(delimiter));
-	path.erase(0, path.find(delimiter) + delimiter.length());
-	return std::make_pair(name, path);
 }
 
 data_type_t data_type(std::string& data){
@@ -590,6 +646,9 @@ void MQTT_Client::update_tree(ustring& packet){
 		topic += packet[4+i];
 		if(packet[4+i] == '/') depth++;
 	}
+
+	std::cout << ((topic_find(topic) != QModelIndex())?("Topic found"):("Go to hell")) << std::endl;
+
 	std::string value = "";
 	for(unsigned int i = 2+t_index+topic_len; i < packet.length(); i++){
 		value += packet[i];
