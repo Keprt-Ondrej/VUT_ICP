@@ -62,7 +62,8 @@ class MQTT_Client : private TCP_Client{
 		int mqtt_recv(int timeout);
 		void set_tree_root(QStandardItemModel* root);
 		bool get_connected();
-		QModelIndex topic_find(std::string& topic);        
+		QModelIndex topic_find(std::string& topic);
+		int start_receiving();
 
 	private:
 		uint32_t to_remaining_len(uint32_t rem_len);
@@ -74,10 +75,12 @@ class MQTT_Client : private TCP_Client{
 		int rm_packet_id(uint16_t packet_id);
 		int received_data(ustring& received_packet);
 		void update_tree(ustring& packet);
+		void delete_tree(QStandardItem* item);
 
 		client_t client;
 		std::vector<std::tuple<PacketType, uint16_t>> pending_ack; // ack type, packet_id and ?timestamp(not yet)
 		std::vector<uint16_t> unavailable_packet_id;
+		std::thread receiving_thread;
 		bool connected;
 		QStandardItemModel* tree_root;
 

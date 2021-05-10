@@ -5,11 +5,6 @@
 #include <iomanip>  // setw, internal, setfill; DELLETE LATER
 #include <iostream>
 
-#include <QHash>
-#include <cerrno>
-
-#include <QTextBrowser>
-
 
 // REWORK timeout on pending acks & resend
 
@@ -140,13 +135,15 @@ int MQTT_Client::broker_disconnect(){
 	/// Send disconnect nofification
 	if(connected){
 		connected = false;
-		char ping_packet[] = {static_cast<char>(DISCONNECT << 4), 0};
-		int retval = tcp_send(ping_packet, 2);
+		char disconnect_packet[] = {static_cast<char>(DISCONNECT << 4), 0};
+		int retval = tcp_send(disconnect_packet, 2);
 		if(retval) return retval;
-		if(tree_root != NULL){
+		if(tree_root != NULL){ 
 			delete_tree(NULL);
 		}
 	}
+
+	stop_receiving();
 
 	return 0;
 }
@@ -376,6 +373,37 @@ QModelIndex MQTT_Client::topic_find(std::string& topic){
 	return blank;
 }
 
+void continuous_receive(MQTT_Client& client){
+	int retval;
+	time_t last_ping = time(0);
+	while(client.get_connected()){
+		retval = client.mqtt_recv(50);
+		if(retval == -2 || last_ping+50 <= time(0)){
+			std::cerr << "MQTT timeout.\n";
+			client.ping();
+			last_ping = time(0);
+		}
+		else if(retval){
+			std::cerr << "Some error occured: " << retval << std::endl;
+			break;
+		}
+	}
+}
+
+int MQTT_Client::start_receiving(){
+	if(receiving_thread.joinable() == false)
+		return -1;
+
+	receiving_thread.join();
+}
+
+int MQTT_Client::stop_receiving(){
+	if(!receiving_thread.joinable())
+		return -1;
+
+	receiving_thread = std::thread(continuous_receive, std::ref(*this));
+}
+
 uint32_t MQTT_Client::to_remaining_len(uint32_t rem_len){
 	if(rem_len == 0 || rem_len&0xF0000000){ // Maximal length is 28 bits
 		std::cerr << "Invalid length of " << rem_len << std::endl;
@@ -487,7 +515,7 @@ int MQTT_Client::received_data(ustring& received_packet){
 		case PUBLISH:
 			std::cout << "PUBLISH arrived.\n";
 			qos = (received_packet[0]&0b0110) >> 1;
-			update_tree(received_packet);           
+			update_tree(received_packet);
 			if(qos != 0){
 				uint16_t tmp_len = (received_packet[2] << 8) | received_packet[3];
 				packet_id = (received_packet[2+tmp_len] << 8) | received_packet[3+tmp_len];
