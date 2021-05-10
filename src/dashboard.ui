@@ -14,35 +14,10 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0" colspan="4">
-    <widget class="QScrollArea" name="scrollArea">
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
-     </property>
-     <property name="widgetResizable">
-      <bool>true</bool>
-     </property>
-     <widget class="QWidget" name="scrollAreaWidgetContents">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>788</width>
-        <height>499</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <layout class="QVBoxLayout" name="widgets_frame"/>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
    <item row="1" column="0">
     <widget class="QLineEdit" name="topicPath">
      <property name="text">
-      <string>koren/data</string>
+      <string>$SYS/broker/uptime</string>
      </property>
      <property name="placeholderText">
       <string>path/to/topic</string>
@@ -96,6 +71,31 @@
      </item>
     </widget>
    </item>
+   <item row="2" column="0" colspan="6">
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>788</width>
+        <height>499</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QVBoxLayout" name="widgets_frame"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
    <item row="1" column="3">
     <widget class="QPushButton" name="addWidget">
      <property name="sizePolicy">
@@ -120,22 +120,20 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="widgetDescription">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
+   <item row="1" column="4">
+    <widget class="QPushButton" name="update">
+     <property name="text">
+      <string>update</string>
      </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QTextEdit" name="description">
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>16777215</height>
+       <height>25</height>
       </size>
-     </property>
-     <property name="placeholderText">
-      <string>Widget description</string>
      </property>
     </widget>
    </item>

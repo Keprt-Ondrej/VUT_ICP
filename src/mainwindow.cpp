@@ -170,8 +170,7 @@ void MainWindow::on_TopicEdit_released()
 void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index)
 {
     if (index.data(3).toBool())
-    { //is topic
-        qInfo() << index.data(0) << "\t" << index.data(2);
+    { //is topic        
         displayedData = const_cast<QModelIndex &>(index);
         QString stringData = "";
         /*data_type_t*/ int type = index.data(5).toList().at(0).toInt();
@@ -201,8 +200,6 @@ void MainWindow::on_actionDashboard_triggered()
     DashBoard dashBoard(sharedMqtt,nullptr);
     dashBoard.setModal(true);
     dashBoard.setWindowFlags(Qt::Window);
-    dashBoard.setWindowTitle("Dash Board");
-    sharedMqtt.dashBoardOpened = true;
-    dashBoard.exec();
-    sharedMqtt.dashBoardOpened = false;
+    dashBoard.setWindowTitle("Dash Board");  
+    dashBoard.exec();   
 }

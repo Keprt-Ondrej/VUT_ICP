@@ -4,10 +4,6 @@
 #include <fcntl.h>  // fcntl
 #include <iomanip>  // setw, internal, setfill; DELLETE LATER
 #include <iostream>
-#include <QHash>
-
-#include <QTextBrowser>
-
 
 // REWORK timeout on pending acks & resend\
 // REWORK check if received remaining length is calculated well
@@ -473,12 +469,7 @@ int MQTT_Client::received_data(ustring& received_packet){
 		case PUBLISH:
 			std::cout << "PUBLISH arrived.\n";
 			qos = (received_packet[0]&0b0110) >> 1;
-			update_tree(received_packet);
-
-            if (dashBoardOpened){
-                dashBoardGUI->updateGUI();
-            }
-
+			update_tree(received_packet);           
 			if(qos != 0){
 				uint16_t tmp_len = (received_packet[2] << 8) | received_packet[3];
 				packet_id = (received_packet[2+tmp_len] << 8) | received_packet[3+tmp_len];

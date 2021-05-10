@@ -1,45 +1,41 @@
 #include "dashboard.h"
-#include <QDebug>
-#include <QVBoxLayout>
 #include <QPushButton>
-#include <QScrollArea>
-#include <QCheckBox>
+#include <QDebug>
 #include <QLabel>
 #include <QFile>
 #include <QTextBrowser>
 #include "mqtt_client.h"
-#include <QSpacerItem>
 #include <QMessageBox>
-#include <string>   
-#include <QLineEdit> 
+#include "newandedittopic.h"
 
 DashBoard::DashBoard(MQTT_Client &mqtt,QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DashBoard),
     thermometherPNG("examples/thermomether.png"),
     mqtt(mqtt)
-{
-    ui->setupUi(this);   
-    layout = qobject_cast<QVBoxLayout*>(ui->widgets_frame->layout());
-
-    mqtt.dashBoardGUI = this;
-
-    mojelajna = new QLineEdit("Konec",nullptr);
-    mojelajna->setObjectName("mojelajna");
-    layout->addWidget(mojelajna);
-
-   
+{    
+    connect(this, SIGNAL(dataChanged()), this, SLOT(updateGUI()));
+    ui->setupUi(this); 
+    connect(ui->update, SIGNAL(clicked()), this, SLOT(updateGUI()));      
+    layout = qobject_cast<QVBoxLayout*>(ui->widgets_frame->layout());    
 }
 
 DashBoard::~DashBoard()
-{
+{       
+    QLayoutItem *removeItem;
+    foreach(QHBoxLayout* widgetCluster,mapDataToDisplay.keys()){         
+        while (widgetCluster->count() != 0){
+            removeItem = widgetCluster->takeAt(0);
+            delete removeItem->widget();
+            delete removeItem;
+        }
+        delete widgetCluster;  
+    }
     delete ui;
 }
 
-
 void DashBoard::on_addWidget_released()
-{    
-    //QModelIndex topic_find(std::string& topic);
+{        
     QString QTopicPath = ui->topicPath->text();
     std::string topicPath = QTopicPath.toUtf8().constData();
     QModelIndex dataIndex = mqtt.topic_find(topicPath);    
@@ -63,87 +59,94 @@ void DashBoard::on_addWidget_released()
     QHBoxLayout *newWidget = new QHBoxLayout(nullptr); 
 
     QLabel *icon = new QLabel("Teplomeros",nullptr);    
-    icon->setMaximumSize(150,150);
+    icon->setMaximumSize(100,100);
     if (widgetType == "temperature"){
         icon->setPixmap(thermometherPNG);
     }
     else if (widgetType == "wattmeter"){
-        icon->setPixmap(thermometherPNG);
-        icon->setStyleSheet("QLabel{background-color: #00FF50}");
+       // icon->setPixmap(thermometherPNG);       
     }
     else if(widgetType == "humidity meter"){
-        icon->setPixmap(thermometherPNG);
-        icon->setStyleSheet("QLabel{background-color: #50FF00}");
+        //icon->setPixmap(thermometherPNG);        
     }
     else if (widgetType == "relay"){
-        icon->setPixmap(thermometherPNG);
-        icon->setStyleSheet("QLabel{background-color: #00FF50}");
+        //icon->setPixmap(thermometherPNG);        
     }
     else if (widgetType == "blank"){
         icon->setStyleSheet("QLabel{background : transparent}");
     }
+    icon->setStyleSheet("QLabel{background-color: #50FF00}");
     newWidget->addWidget(icon);   
    
     
     QTextBrowser *widgetDescription = new QTextBrowser(nullptr);
-    widgetDescription->setText(ui->widgetDescription->text());    
+    widgetDescription->setText(ui->description->toPlainText());    
     widgetDescription->setStyleSheet("QTextBrowser{background-color: #00FF00}");    //widgetDescription->setStyleSheet("QTextBrowser{background : transparent}");
     widgetDescription->setMaximumSize(150,100);
     newWidget->addWidget(widgetDescription);
-
-    QTextBrowser *data = new QTextBrowser(nullptr);    
+    
+    QTextBrowser *data = new QTextBrowser(nullptr);       
     data->setStyleSheet("QTextBrowser{	background-color: #00FF00}");
     data->setText(dataIndex.data(6).toList().at(0).toString());
-    qInfo() << data; 
-    newWidget->addWidget(data);    
+    data->setMaximumSize(700,100);    
+    newWidget->addWidget(data);   
 
-    QPushButton* button = new QPushButton("Remowe widget",nullptr);  
-    button->setStyleSheet("QPushButton:pressed{	background-color: #00FF00}");
-    QObject::connect(button,&QPushButton::released,this,&DashBoard::removeWidget);        
-    button->setMaximumSize(120,30);
-    mapButtonToLayout.insert(button,newWidget);     //for proper deleting all widgets
-    newWidget->addWidget(button);
-    mapDataToDisplay.insert(dataIndex,newWidget);    
+    QPushButton* publisButton = new QPushButton("Publish",nullptr);  
+    publisButton->setStyleSheet("QPushButton:pressed{	background-color: #00FF00}");
+    mapPublishButtonToTopicPath.insert(publisButton,QTopicPath);
+    connect(publisButton,&QPushButton::released,this,&DashBoard::updateTopic);   //SLOT(updateTopic(topicPath))      mapPublishButtonToTopicPath.value(publishButton))
+    publisButton->setMaximumSize(120,30);    
+    newWidget->addWidget(publisButton);
 
-    layout->insertLayout(0,newWidget);  
-    
-    QVariant num = layout->count();
-    mojelajna->setText(num.toString());
-    foreach (QPushButton* item,mapButtonToLayout.keys()){
-        qInfo() << item << mapButtonToLayout.value(button);
-    } 
-    
+    QPushButton* removeButton = new QPushButton("Remowe widget",nullptr);  
+    removeButton->setStyleSheet("QPushButton:pressed{	background-color: #00FF00}");
+    QObject::connect(removeButton,&QPushButton::released,this,&DashBoard::removeWidget);        
+    removeButton->setMaximumSize(120,30);
+    mapButtonToLayout.insert(removeButton,newWidget);     //for proper deleting all widgets
+    newWidget->addWidget(removeButton);
+
+    mapDataToDisplay.insert(newWidget,dataIndex);  
+    layout->insertLayout(0,newWidget);
 }
 
 void DashBoard::removeWidget()
 {    
     QPushButton* button = qobject_cast<QPushButton*>(sender());
     QHBoxLayout* removeLayout = mapButtonToLayout.take(button);    
+    mapDataToDisplay.take(removeLayout);
     QLayoutItem *removeItem; 
-
-    QTextBrowser* pls = qobject_cast<QTextBrowser*>(removeLayout->itemAt(2)->widget());
-    pls->setText("koncim tady");
     
     while (removeLayout->count() != 0){
         removeItem = removeLayout->takeAt(0);
         delete removeItem->widget();
         delete removeItem;
     }
-
-    delete removeLayout;  
-    
+    delete removeLayout;
 }
 
 void DashBoard::updateGUI(){
-    foreach (QModelIndex dataIndex,mapDataToDisplay.keys()){
-        QHBoxLayout* widgetCluster = mapDataToDisplay.value(dataIndex);
+    qInfo() << "updating";
+    foreach (QHBoxLayout* widgetCluster,mapDataToDisplay.keys()){
+        QModelIndex dataIndex = mapDataToDisplay.value(widgetCluster);
         QTextBrowser* dataDisplay = qobject_cast<QTextBrowser*>(widgetCluster->itemAt(2)->widget());
         int type = dataIndex.data(5).toList().at(0).toInt();
         if (type == BIN){
-            dataDisplay->setText("Cannot display binnary data");
+            dataDisplay->setText("Cannot display binary data");
         }
-        else{
-            dataDisplay->setText(dataIndex.data(6).toList().at(0).toString());
+        else{            
+            dataDisplay->setText(dataIndex.data(6).toList().at(0).toString());            
         }
     }
-}  
+}
+
+void DashBoard::updateTopic(){
+    //std::string path = topicPath.toUtf8().constData();
+    QPushButton* button = qobject_cast<QPushButton*>(sender());
+    QString path = mapPublishButtonToTopicPath.value(button);
+    QString data = "";
+    NewAndEditTopic EditTopicWindow(mqtt,path,data, nullptr);
+    EditTopicWindow.setModal(false);
+    EditTopicWindow.setWindowFlags(Qt::Window);
+    EditTopicWindow.setWindowTitle("Publish: "+path);
+    EditTopicWindow.exec();
+}

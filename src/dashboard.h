@@ -20,11 +20,15 @@ public slots:
      * 
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
-    void updateGUI();        
+    void updateGUI();    
+
+signals:
+    void dataChanged();
 
 private slots:
     void on_addWidget_released();
     void removeWidget();
+    void updateTopic();
 
 private:
     Ui::DashBoard *ui; 
@@ -32,8 +36,8 @@ private:
     QHash<QPushButton*,QHBoxLayout*> mapButtonToLayout; 
     QPixmap thermometherPNG;
     MQTT_Client &mqtt;
-    QHash<QModelIndex,QHBoxLayout*> mapDataToDisplay;
-    QLineEdit * mojelajna;
+    QHash<QHBoxLayout*,QModelIndex> mapDataToDisplay; 
+    QHash<QPushButton*,QString> mapPublishButtonToTopicPath;   
 };
 
 #endif // DASHBOARD_H

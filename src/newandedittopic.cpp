@@ -7,9 +7,7 @@
 */
 
 #include "newandedittopic.h"
-#include <QFileDialog>  ///< \todo delete
-#include <QDebug>
-#include <iostream>
+#include <QFileDialog>  
 #include <QMessageBox>  
 #include "mqtt_client.h"
 #include <fstream>
