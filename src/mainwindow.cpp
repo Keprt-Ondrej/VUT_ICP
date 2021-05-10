@@ -32,10 +32,10 @@ MainWindow::MainWindow(MQTT_Client &mqtt, QWidget *parent) :
     QStandardItemModel *model = new QStandardItemModel();
     sharedMqtt.set_tree_root(model);
 
-    QStandardItem *item0 = new QStandardItem("1 first item");
+    QStandardItem *item0 = new QStandardItem("koren");
     QStandardItem *item1 = new QStandardItem("2 second item");
-    QStandardItem *item3 = new QStandardItem("TESTOVACI DATA HERE");
-    QStandardItem *item4 = new QStandardItem("Cute kittens");
+    QStandardItem *item3 = new QStandardItem("data");
+    QStandardItem *item4 = new QStandardItem("cats"); 
 
     QList<QVariant> my_list;
     QList<QVariant> my_list_types; //BOOL nejde, protoze pak by nesel ulozit do QVariant
@@ -202,5 +202,7 @@ void MainWindow::on_actionDashboard_triggered()
     dashBoard.setModal(true);
     dashBoard.setWindowFlags(Qt::Window);
     dashBoard.setWindowTitle("Dash Board");
+    sharedMqtt.dashBoardOpened = true;
     dashBoard.exec();
+    sharedMqtt.dashBoardOpened = false;
 }

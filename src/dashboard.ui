@@ -14,7 +14,42 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="1">
+   <item row="2" column="0" colspan="4">
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>788</width>
+        <height>499</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QVBoxLayout" name="widgets_frame"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLineEdit" name="topicPath">
+     <property name="text">
+      <string>koren/data</string>
+     </property>
+     <property name="placeholderText">
+      <string>path/to/topic</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
     <widget class="QComboBox" name="widgetType">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
@@ -39,16 +74,29 @@
        <string>temperature</string>
       </property>
      </item>
+     <item>
+      <property name="text">
+       <string>blank</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>wattmeter</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>humidity meter</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>relay</string>
+      </property>
+     </item>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLineEdit" name="newTopicPath">
-     <property name="placeholderText">
-      <string>path/to/topic</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
+   <item row="1" column="3">
     <widget class="QPushButton" name="addWidget">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
@@ -72,26 +120,23 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="QScrollArea" name="scrollArea">
-     <property name="widgetResizable">
-      <bool>true</bool>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="widgetDescription">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
      </property>
-     <widget class="QWidget" name="scrollAreaWidgetContents">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>788</width>
-        <height>499</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <layout class="QVBoxLayout" name="widgets_frame"/>
-       </item>
-      </layout>
-     </widget>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="placeholderText">
+      <string>Widget description</string>
+     </property>
     </widget>
    </item>
   </layout>

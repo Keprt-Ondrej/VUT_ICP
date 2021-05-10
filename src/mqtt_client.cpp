@@ -4,6 +4,9 @@
 #include <fcntl.h>  // fcntl
 #include <iomanip>  // setw, internal, setfill; DELLETE LATER
 #include <iostream>
+#include <QHash>
+
+#include <QTextBrowser>
 
 // REWORK timeout on pending acks & resend\
 // REWORK check if received remaining length is calculated well
@@ -699,4 +702,25 @@ void MQTT_Client::update_tree(ustring& packet){
 		item->setData(QString::fromStdString(full_path), 7);
 		item->setForeground(QBrush(QColor(250,0,0)));
 	}
+}
+
+
+void MQTT_Client::updateGUI(){
+    if(dashBoardOpened){
+        foreach (QModelIndex dataIndex,mapDataToDisplay.keys()){
+            QHBoxLayout* widgetCluster = mapDataToDisplay.value(dataIndex);
+            QTextBrowser* dataDisplay = qobject_cast<QTextBrowser*>(widgetCluster->itemAt(2)->widget());
+            int type = dataIndex.data(5).toList().at(0).toInt();
+            if (type == BIN){
+                dataDisplay->setText("Cannot display binnary data");
+            }
+            else{
+                dataDisplay->setText(dataIndex.data(6).toList().at(0).toString());
+            }
+        }  
+    }
+    else{
+        std::cout << "No dashboard\n"; 
+        ///\todo update main window
+    }
 }
