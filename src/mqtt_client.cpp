@@ -5,8 +5,13 @@
 #include <iomanip>  // setw, internal, setfill; DELLETE LATER
 #include <iostream>
 
-// REWORK timeout on pending acks & resend\
-// REWORK check if received remaining length is calculated well
+#include <QHash>
+#include <cerrno>
+
+#include <QTextBrowser>
+
+
+// REWORK timeout on pending acks & resend
 
 #define INSERT_REM_LEN(len, packet)            \
 	while(len != 0){                           \
@@ -38,7 +43,7 @@ void _print_packet(const uint8_t* received_packet, int size){
 			std::cout << tmp_buf << std::endl;
 	for(int i = 0; i < size; i++){
 		if(i%8 == 0){
-			std::cout << tmp_buf << std::endl;
+			std::cout << " "<< tmp_buf << std::endl;
 			tmp_buf.clear();
 		}
 		std::cout << std::internal << std::setfill('0');
@@ -46,6 +51,12 @@ void _print_packet(const uint8_t* received_packet, int size){
 		if(received_packet[i] >= 32) tmp_buf += received_packet[i];
 		else tmp_buf += '.';
 	}
+
+	for(int i = 0; i < size%8; i++){
+		std::cout << "   ";
+	}
+	std::cout << " "<< tmp_buf << std::endl;
+
 	std::cout << std::dec << std::endl;
 }
 template<typename T>
@@ -132,6 +143,9 @@ int MQTT_Client::broker_disconnect(){
 		char ping_packet[] = {static_cast<char>(DISCONNECT << 4), 0};
 		int retval = tcp_send(ping_packet, 2);
 		if(retval) return retval;
+		if(tree_root != NULL){
+			delete_tree(NULL);
+		}
 	}
 
 	return 0;
@@ -145,7 +159,7 @@ int MQTT_Client::publish(const std::string& topic, const std::string& value, pub
 	uint32_t remaining_length = 0;
 	std::string publish_packet;
 
-	if(opt.QoS != 0) remaining_length = to_remaining_len(4+topic.length()+value.length()); // 2+2+2 bytes for topic, packet identifier and payload lengths + the actual data
+	if(opt.QoS != 0) remaining_length = to_remaining_len(4+topic.length()+value.length()); // 2+2 bytes for topic and packet identifier lengths + the actual data
 	else             remaining_length = to_remaining_len(2+topic.length()+value.length()); // Same as ^ , but no packet identifier
 
 	/// Create fixed header
@@ -260,14 +274,11 @@ int MQTT_Client::mqtt_recv(int timeout){
 	FD_ZERO(&read_socket);
 	FD_SET(tcp_socket, &read_socket);
 
+
 	/// Set up timeout in case the server doesnt respond
 	int retval = select(tcp_socket+1, &read_socket, NULL, NULL, &timer);
 	if(retval < 0) return retval-10;       // Error
 	else if(retval == 0) return -2; // Timeout
-
-	/// Set nonblocking reading
-	retval = fcntl(tcp_socket, F_SETFL, O_NONBLOCK);
-	if(retval < 0) return -3;
 
 	/// Load an MQTT packet
 	/// Control header
@@ -280,6 +291,7 @@ int MQTT_Client::mqtt_recv(int timeout){
 		return -5;
 	}
 	packet += c;
+
 	/// Remaining length
 	uint32_t index = 0;
 	do{
@@ -288,18 +300,23 @@ int MQTT_Client::mqtt_recv(int timeout){
 		if(retval < 0) return -4;
 		packet += c;
 		remaining_length |= (c&0x7F) << (index*7);
+		index++;
 	}while(c&0x80);
-
+	
 	/// Rest of the packet
 	for(index = 0; index < remaining_length; index++){
 		retval = recv(tcp_socket, &c, 1, 0);
-		if(retval < 0) return -4;
+		if(retval == 0) return -5;
+		if(retval < 0){
+			return retval-10;
+		}
 		packet += c;
 	}
 
 	/// Do something with the data
 	received_data(packet);
 
+	//usleep(1000);	
 	return 0;
 }
 
@@ -445,6 +462,7 @@ int MQTT_Client::rm_packet_id(uint16_t packet_id){
 
 int MQTT_Client::received_data(ustring& received_packet){
 	/// Parse & print acquired packet
+	//print_packet(received_packet);
 	int qos = 0;
 	uint16_t packet_id = 0;
 	switch(received_packet[0]>>4){
@@ -524,14 +542,20 @@ int MQTT_Client::received_data(ustring& received_packet){
 			packet_id = (received_packet[2] << 8) | received_packet[3];
 			break;
 
-		case SUBACK: std::cout << "SUBACK arrived.\n"; break;
-		case UNSUBACK: std::cout << "UNSUBACK arrived.\n"; break;
+		case 
+			SUBACK: std::cout << "SUBACK arrived.\n"; 
+			packet_id = (received_packet[2] << 8) | received_packet[3];
+			break;
+		case 
+			UNSUBACK: std::cout << "UNSUBACK arrived.\n"; 
+			packet_id = (received_packet[2] << 8) | received_packet[3];
+			break;
 		case PINGRESP: std::cout << "PINGRESP arrived.\n"; break;
 
 		default:{
 			static int count = 0;
 			std::cout << "Oh no, anyway...(" << (received_packet[0]>>4) << "): " << count++ << " times.\n";
-			print_packet<uint8_t>(received_packet);
+			//print_packet<uint8_t>(received_packet);
 		}
 	}
 
@@ -647,7 +671,7 @@ void MQTT_Client::update_tree(ustring& packet){
 		if(packet[4+i] == '/') depth++;
 	}
 
-	std::cout << ((topic_find(topic) != QModelIndex())?("Topic found"):("Go to hell")) << std::endl;
+	//std::cout << ((topic_find(topic) != QModelIndex())?("Topic found"):("Go to hell")) << std::endl;
 
 	std::string value = "";
 	for(unsigned int i = 2+t_index+topic_len; i < packet.length(); i++){
@@ -698,5 +722,29 @@ void MQTT_Client::update_tree(ustring& packet){
 		item->setData(my_list, 6);
 		item->setData(QString::fromStdString(full_path), 7);
 		item->setForeground(QBrush(QColor(250,0,0)));
+	}
+}
+
+void MQTT_Client::delete_tree(QStandardItem* item){
+	if(item == NULL){
+		if(tree_root == NULL) return;
+		for(int i = 0; i < tree_root->rowCount(); i++){
+			delete_tree(tree_root->item(i));
+		}
+		delete tree_root;
+		tree_root = NULL;
+	}
+	else{
+		if(item->rowCount() == 0){
+			delete item;
+			return;
+		}
+		else{
+			for(int i = 0; i < item->rowCount(); i++){
+				delete_tree(item->child(i));
+			}
+			delete item;
+			return;
+		}
 	}
 }
