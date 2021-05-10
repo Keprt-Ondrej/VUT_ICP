@@ -11,7 +11,12 @@
 DashBoard::DashBoard(MQTT_Client &mqtt,QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DashBoard),
-    thermometherPNG("examples/thermomether.png"),
+    thermometherPNG("icons/thermomether.png"),
+    humidityPNG("icons/humidity.png"),
+    wattPNG("icons/watt.png"),
+    leverPNG("icons/lever.png"),
+    detectorPNG("icons/detector.png"),
+    relayPNG("icons/relay.png"),
     mqtt(mqtt)
 {    
     connect(this, SIGNAL(dataChanged()), this, SLOT(updateGUI()));
@@ -58,44 +63,49 @@ void DashBoard::on_addWidget_released()
     QString widgetType = ui->widgetType->currentText();
     QHBoxLayout *newWidget = new QHBoxLayout(nullptr); 
 
-    QLabel *icon = new QLabel("Teplomeros",nullptr);    
+    QLabel *icon = new QLabel("",nullptr);    
     icon->setMaximumSize(100,100);
     if (widgetType == "temperature"){
         icon->setPixmap(thermometherPNG);
     }
     else if (widgetType == "wattmeter"){
-       // icon->setPixmap(thermometherPNG);       
+        icon->setPixmap(wattPNG);       
     }
     else if(widgetType == "humidity meter"){
-        //icon->setPixmap(thermometherPNG);        
+        icon->setPixmap(humidityPNG);        
     }
     else if (widgetType == "relay"){
-        //icon->setPixmap(thermometherPNG);        
+        icon->setPixmap(relayPNG);        
     }
     else if (widgetType == "blank"){
         icon->setStyleSheet("QLabel{background : transparent}");
     }
-    icon->setStyleSheet("QLabel{background-color: #50FF00}");
+    else if (widgetType == "lever"){
+        icon->setPixmap(leverPNG);
+    } 
+    else{
+        icon->setPixmap(detectorPNG);
+    }    
     newWidget->addWidget(icon);   
    
     
     QTextBrowser *widgetDescription = new QTextBrowser(nullptr);
     widgetDescription->setText(ui->description->toPlainText());    
-    widgetDescription->setStyleSheet("QTextBrowser{background-color: #00FF00}");    //widgetDescription->setStyleSheet("QTextBrowser{background : transparent}");
-    widgetDescription->setMaximumSize(150,100);
+    widgetDescription->setStyleSheet("QTextBrowser{background : transparent}");    //widgetDescription->setStyleSheet("QTextBrowser{background : transparent}");
+    widgetDescription->setMaximumSize(300,100);
     newWidget->addWidget(widgetDescription);
     
     QTextBrowser *data = new QTextBrowser(nullptr);       
-    data->setStyleSheet("QTextBrowser{	background-color: #00FF00}");
+    data->setStyleSheet("QTextBrowser{background : transparent}");
     data->setText(dataIndex.data(6).toList().at(0).toString());
-    data->setMaximumSize(700,100);    
+    data->setMaximumSize(1000,100);    
     newWidget->addWidget(data);   
 
     QPushButton* publisButton = new QPushButton("Publish",nullptr);  
     publisButton->setStyleSheet("QPushButton:pressed{	background-color: #00FF00}");
     mapPublishButtonToTopicPath.insert(publisButton,QTopicPath);
     connect(publisButton,&QPushButton::released,this,&DashBoard::updateTopic);   //SLOT(updateTopic(topicPath))      mapPublishButtonToTopicPath.value(publishButton))
-    publisButton->setMaximumSize(120,30);    
+    publisButton->setMaximumSize(100,30);    
     newWidget->addWidget(publisButton);
 
     QPushButton* removeButton = new QPushButton("Remowe widget",nullptr);  
@@ -113,8 +123,11 @@ void DashBoard::removeWidget()
 {    
     QPushButton* button = qobject_cast<QPushButton*>(sender());
     QHBoxLayout* removeLayout = mapButtonToLayout.take(button);    
+    QPushButton* publishButton = removeLayout->itemAt(3);
+    mapPublishButtonToTopicPath.take(publishButton);
     mapDataToDisplay.take(removeLayout);
     QLayoutItem *removeItem; 
+
     
     while (removeLayout->count() != 0){
         removeItem = removeLayout->takeAt(0);

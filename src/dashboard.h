@@ -35,6 +35,11 @@ private:
     QVBoxLayout *layout;  
     QHash<QPushButton*,QHBoxLayout*> mapButtonToLayout; 
     QPixmap thermometherPNG;
+    QPixmap humidityPNG;
+    QPixmap wattPNG;
+    QPixmap leverPNG;
+    QPixmap detectorPNG;
+    QPixmap relayPNG;
     MQTT_Client &mqtt;
     QHash<QHBoxLayout*,QModelIndex> mapDataToDisplay; 
     QHash<QPushButton*,QString> mapPublishButtonToTopicPath;   

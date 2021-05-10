@@ -51,6 +51,16 @@
      </item>
      <item>
       <property name="text">
+       <string>detector</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>lever</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>blank</string>
       </property>
      </item>
