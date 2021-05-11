@@ -294,9 +294,7 @@ int MQTT_Client::mqtt_recv(int timeout){
 	for(index = 0; index < remaining_length; index++){
 		retval = recv(tcp_socket, &c, 1, 0);
 		if(retval == 0) return -5;
-		if(retval < 0){
-			return retval-20;
-		}
+		if(retval < 0) return -4;
 		packet += c;
 	}
 
@@ -339,6 +337,9 @@ std::pair<std::string,std::string> getPath(std::string path){
  * @param	topic	Path to the element
  * 
  * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+ *
+ * @return
+ *		- QModelIndex
  */
 QModelIndex _topic_find(QStandardItem* item, std::string& topic){
 	QModelIndex blank = QModelIndex();
@@ -506,7 +507,6 @@ void MQTT_Client::rm_packet_id(uint16_t packet_id){
 
 int MQTT_Client::received_data(ustring& received_packet){
 	/// Parse & print acquired packet
-	//print_packet(received_packet);
 	int qos = 0;
 	uint16_t packet_id = 0;
 	switch(received_packet[0]>>4){
@@ -647,12 +647,13 @@ data_type_t data_type(const std::string& data){
  * @param	received	Flag to signalize if the topic was received or published
  * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
  * @return
- *		- 0
- *		- -1
+ *		- 0		-> OK
+ *		- -1	-> Topic not found
+ *		- -10	-> Allocation failed
  */
 int update_topic(QStandardItem* item, const std::string& name, const std::string value, int depth, bool received){
 	if(item == NULL || depth < 0) return -1;
-	//usleep(10);
+	usleep(10);
 	std::pair<std::string,std::string> path = getPath(name);
 	static std::string full_path = "";
 	full_path += item->data(0).toString().toStdString() + "/";

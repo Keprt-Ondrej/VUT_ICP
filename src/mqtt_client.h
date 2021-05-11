@@ -111,12 +111,12 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @return
-		 *		- 0
-		 *		- -1
-		 *		- -3
-		 *		- -4
-		 *		- -11
-		 *		- -12
+		 *		- 0		-> OK
+		 *		- -1	-> TCP connection error; DNS lookup failed
+		 *		- -3	-> TCP connection error; Socket opening failed
+		 *		- -4	-> TCP connection error; TCP server connection failed
+		 *		- -11	-> TCP send error; Bad arguments or not connected
+		 *		- -12	-> TCP send error; Packet sending failed
 		 */
 		int broker_connect(client_t info);
 
@@ -126,9 +126,9 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @return
-		 *		- 0
-		 *		- -1
-		 *		- -2
+		 *		- 0		-> OK
+		 *		- -1	-> TCP send error; Bad arguments or not connected
+		 *		- -2	-> TCP send error; Packet sending failed
 		 */
 		int broker_disconnect();
 
@@ -141,10 +141,10 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @return
-		 *		- 0
-		 *		- -1
-		 *		- -11
-		 *		- -12
+		 *		- 0		-> OK
+		 *		- -1	-> Bad arguments or not connected to broker
+		 *		- -11	-> TCP send error; Bad arguments or not connected
+		 *		- -12	-> TCP send error; Packet sending failed
 		 */
 		int publish(const std::string& topic, const std::string& value, pubflg_t opt={0,0,0});
 
@@ -155,10 +155,10 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @return
-		 *		- 0
-		 *		- -1
-		 *		- -11
-		 *		- -12
+		 *		- 0		-> OK
+		 *		- -1	-> Not connected to broker
+		 *		- -11	-> TCP send error; Bad arguments or not connected
+		 *		- -12	-> TCP send error; Packet sending failed
 		 */
 		int subscribe(const std::string& topic);
 
@@ -169,10 +169,10 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @return
-		 *		- 0
-		 *		- -1
-		 *		- -11
-		 *		- -12
+		 *		- 0		-> OK
+		 *		- -1	-> Not connected to broker
+		 *		- -11	-> TCP send error; Bad arguments or not connected
+		 *		- -12	-> TCP send error; Packet sending failed
 		 */
 		int unsubscribe(const std::string& topic);
 
@@ -182,8 +182,8 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @return
-		 *		- 0
-		 *		- -1
+		 *		- 0		-> OK
+		 *		- -1	-> Not connected to broker
 		 */
 		int ping();
 
@@ -194,13 +194,12 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @return
-		 *		- 0
-		 *		- -1
-		 *		- -2
-		 *		- -4
-		 *		- -5
-		 *		- -11
-		 *		- -21
+		 *		- 0		-> OK
+		 *		- -1	-> TCP server not connected
+		 *		- -2	-> TCP incoming packet timeout
+		 *		- -4	-> TCP receive error
+		 *		- -5	-> TCP connection closed
+		 *		- -11	-> Socket data wait (syscall select) error
 		 */
 		int mqtt_recv(int timeout);
 
@@ -218,8 +217,8 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @return
-		 *		- false
-		 *		- true
+		 *		- false	-> Client not connected
+		 *		- true	-> Client connected
 		 */
 		bool get_connected();
 
@@ -229,8 +228,8 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @return
-		 *		- false
-		 *		- true
+		 *		- false	-> Traffic simulation not running
+		 *		- true	-> Traffic simulation running
 		 */
 		bool get_simulation_state();
 
@@ -251,8 +250,8 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @return
-		 *		- 0
-		 *		- -1
+		 *		- 0		-> OK
+		 *		- -1	-> Thread already running
 		 */
 		int start_receiving();
 
@@ -262,8 +261,8 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @return
-		 *		- 0
-		 *		- -1
+		 *		- 0		-> OK
+		 *		- -1	-> Thread not running
 		 */
 		int stop_receiving();
 		
@@ -357,8 +356,8 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @return
-		 *		- 0
-		 *		- -1
+		 *		- 0		-> OK
+		 *		- -1	-> Unexpected packet
 		 */
 		int rm_ack(std::tuple<PacketType, uint16_t> ack);
 
@@ -369,8 +368,9 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @return
-		 *		- 0
-		 *		- -1
+		 *		- 0		-> OK
+		 *		- -11	-> TCP send error; Bad arguments or not connected
+		 *		- -12	-> TCP send error; Packet sending failed
 		 */
 		int received_data(ustring& received_packet);
 
