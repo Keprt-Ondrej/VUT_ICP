@@ -107,6 +107,8 @@
    <addaction name="actionNew_Topic"/>
    <addaction name="separator"/>
    <addaction name="actionDashboard"/>
+   <addaction name="separator"/>
+   <addaction name="actionSimulate"/>
   </widget>
   <action name="actionConnect_server">
    <property name="text">
@@ -129,6 +131,11 @@
   <action name="actionDisconnect">
    <property name="text">
     <string>Disconnect</string>
+   </property>
+  </action>
+  <action name="actionSimulate">
+   <property name="text">
+    <string>Simulate</string>
    </property>
   </action>
  </widget>

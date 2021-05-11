@@ -30,6 +30,7 @@ MainWindow::MainWindow(MQTT_Client &mqtt, QWidget *parent) :
     tree_model = new QStandardItemModel();
     sharedMqtt.set_tree_root(tree_model);
     ui->TreeView->setModel(tree_model);
+    simulate = ui->toolBar->actions().at(8);    
 }
 
 MainWindow::~MainWindow()
@@ -136,6 +137,7 @@ void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index)
 {
     if (index.data(3).toBool())
     { //is topic        
+        //index.setForeground(QBrush(QColor(0,0,0)));
         displayedData = const_cast<QModelIndex &>(index);
         QString stringData = "";
         /*data_type_t*/ int type = index.data(5).toList().at(0).toInt();
@@ -173,4 +175,10 @@ void MainWindow::on_actionDisconnect_triggered()
 {
     sharedMqtt.broker_disconnect();
     
+}
+
+void MainWindow::on_actionSimulate_triggered()
+{
+    qInfo() << "HERE";
+    simulate->setText("Hellolo");
 }

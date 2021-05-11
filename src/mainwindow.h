@@ -43,12 +43,11 @@ public:
     */
     ~MainWindow();
 
-public:
+private:
     Ui::MainWindow *ui;         ///< pointer on UI
     QModelIndex &displayedData; ///< brief Index to data storage, that are now displayed
     MQTT_Client &sharedMqtt;    ///< reference to application data
-
-private:
+    QAction *simulate;
     QStandardItemModel* tree_model;
 
 private slots:
@@ -112,7 +111,16 @@ private slots:
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
     void on_actionDashboard_triggered();
+
+    /**
+     * @brief Disconnects from broker
+     * 
+     * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+    */
     void on_actionDisconnect_triggered();
+
+    
+    void on_actionSimulate_triggered();
 };
 
 #endif // MAINWINDOW_H
