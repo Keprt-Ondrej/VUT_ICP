@@ -25,59 +25,10 @@ MainWindow::MainWindow(MQTT_Client &mqtt, QWidget *parent) :
     displayedData(dEfAuLTgLOBAlInDeX),
     sharedMqtt(mqtt)
 {
-
     ui->setupUi(this);
-    this->setWindowTitle("MQTT EXPLORER");  
-
+    this->setWindowTitle("MQTT EXPLORER");
     tree_model = new QStandardItemModel();
     sharedMqtt.set_tree_root(tree_model);
-
-    QStandardItem *item0 = new QStandardItem("koren");
-    QStandardItem *item1 = new QStandardItem("2 second item");
-    QStandardItem *item3 = new QStandardItem("data");
-    QStandardItem *item4 = new QStandardItem("cats"); 
-
-    QList<QVariant> my_list;
-    QList<QVariant> my_list_types; //BOOL nejde, protoze pak by nesel ulozit do QVariant
-    for (int i = 0; i < 1000; i++)
-    {
-        my_list.push_front((double)i);
-        my_list_types.push_front(STRING);
-    }
-
-    item3->setData((bool)true, 3);
-    item3->setData((bool)true, 4);
-    item3->setData(my_list_types, 5);
-    item3->setData(my_list, 6);
-    item3->setData("/karel/sel/na/pomoc/do/bytu", 7);
-    item3->setForeground(QBrush(receivedColor));
-
-    QList<QVariant> my_list1;
-    QList<QVariant> my_list_types1;
-    my_list_types1.push_front(BIN);
-
-    QFile CurrentFile("examples/cats.jpg");
-    if (!CurrentFile.open(QIODevice::ReadOnly))
-        return;
-    QByteArray DataFile = CurrentFile.readAll();
-    QVariant binaryImage = DataFile;
-    my_list1.push_front(binaryImage);
-    item4->setData((bool)true, 3);
-    item4->setData((bool)true, 4);
-    item4->setData(my_list_types1, 5);
-    item4->setData(my_list1, 6);
-    item4->setForeground(QBrush(sendColor));
-    item4->setData("/karel/sel/na/pomoc/do/bytu", 7);
-
-    tree_model->appendRow(item0);
-    item0->appendRow(item3);
-    //item0->appendRow(item9);
-    item0->appendRow(item4);
-    tree_model->appendRow(item1);
-
-    QStandardItem *vytahnutej = tree_model->item(0);
-    vytahnutej = vytahnutej->child(0);
-
     ui->TreeView->setModel(tree_model);
 }
 

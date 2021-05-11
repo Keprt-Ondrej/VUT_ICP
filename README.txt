@@ -8,6 +8,4 @@ Autoři:
 Matúš Fabo (xfabom01@stud.fit.vutbr.cz)
 Ondřej Keprt (xkeprt03@stud.fit.vutbr.cz)
 
-Pokud nelze projekt přeložit, zkontrolujte, zda existuje ./src/obj
-
 Spustitelný soubor se jmenuje mqttexp

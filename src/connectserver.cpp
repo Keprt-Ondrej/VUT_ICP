@@ -39,6 +39,9 @@ void ConnectServer::connectToServer()
     std::string username = usernameQS.toUtf8().constData();
     QString passwordQS = ui->Password->text();
     std::string password = passwordQS.toUtf8().constData();
+    QString QTopics = ui->subscribeTopic->toPlainText();
+    std::string topics = QTopics.toUtf8().constData();
+    std::cout << topics << std::endl;
 
     client_t info{
         host,

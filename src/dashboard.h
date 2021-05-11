@@ -1,3 +1,11 @@
+/**
+ * @file dashboard.h
+ * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+ * 
+ * @brief Declaration of class for displaying window with Dashboard
+ * 
+*/
+
 #ifndef DASHBOARD_H
 #define DASHBOARD_H
 
@@ -6,11 +14,24 @@
 #include <QHash>
 class MQTT_Client; // forward declaration for proper compiling
 
+
+/**
+ * @brief Declaration of class for displaying window with Dashboard
+ * 
+ * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+*/
 class DashBoard : public QDialog
 {
     Q_OBJECT
 
 public:
+    /**
+     * @brief Construct a new Dash Board object
+     * 
+     * @param mqtt reference to application data
+     * @param parent 
+     * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+    */
     explicit DashBoard(MQTT_Client &mqtt,QWidget *parent = nullptr);
     ~DashBoard();
 
@@ -23,6 +44,11 @@ public slots:
     void updateGUI();    
 
 signals:
+    /**
+     * @brief Signa
+     * 
+     * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+    */
     void dataChanged();
 
 private slots:

@@ -1,3 +1,11 @@
+/**
+ * @file dashboard.cpp
+ * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+ * 
+ * @brief Definition of class for displaying window with Dashboard
+ * 
+*/
+
 #include "dashboard.h"
 #include <QPushButton>
 #include <QDebug>
@@ -91,14 +99,14 @@ void DashBoard::on_addWidget_released()
     
     QTextBrowser *widgetDescription = new QTextBrowser(nullptr);
     widgetDescription->setText(ui->description->toPlainText());    
-    widgetDescription->setStyleSheet("QTextBrowser{background : transparent}");    //widgetDescription->setStyleSheet("QTextBrowser{background : transparent}");
-    widgetDescription->setMaximumSize(300,100);
+    widgetDescription->setStyleSheet("QTextBrowser{background : transparent;text-align:center;}");    //widgetDescription->setStyleSheet("QTextBrowser{background : transparent}");
+    widgetDescription->setMaximumSize(400,100);
     newWidget->addWidget(widgetDescription);
     
     QTextBrowser *data = new QTextBrowser(nullptr);       
-    data->setStyleSheet("QTextBrowser{background : transparent}");
+    data->setStyleSheet("QTextBrowser{background : transparent;text-align:center;}");
     data->setText(dataIndex.data(6).toList().at(0).toString());
-    data->setMaximumSize(1000,100);    
+    data->setMaximumSize(1500,100);    
     newWidget->addWidget(data);   
 
     QPushButton* publisButton = new QPushButton("Publish",nullptr);  
@@ -123,12 +131,11 @@ void DashBoard::removeWidget()
 {    
     QPushButton* button = qobject_cast<QPushButton*>(sender());
     QHBoxLayout* removeLayout = mapButtonToLayout.take(button);    
-    QPushButton* publishButton = removeLayout->itemAt(3);
+    QPushButton* publishButton = qobject_cast<QPushButton*>(removeLayout->itemAt(3)->widget());
     mapPublishButtonToTopicPath.take(publishButton);
     mapDataToDisplay.take(removeLayout);
     QLayoutItem *removeItem; 
 
-    
     while (removeLayout->count() != 0){
         removeItem = removeLayout->takeAt(0);
         delete removeItem->widget();
