@@ -653,7 +653,6 @@ data_type_t data_type(const std::string& data){
  */
 int update_topic(QStandardItem* item, const std::string& name, const std::string value, int depth, bool received){
 	if(item == NULL || depth < 0) return -1;
-	usleep(10);
 	std::pair<std::string,std::string> path = getPath(name);
 	static std::string full_path = "";
 	full_path += item->data(0).toString().toStdString() + "/";
