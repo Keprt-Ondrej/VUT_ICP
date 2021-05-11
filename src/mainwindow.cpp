@@ -135,10 +135,12 @@ void MainWindow::on_TopicEdit_released()
 */
 void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index)
 {
+    QStandardItem* item = static_cast<QStandardItem*>(index.internalPointer());
+    item->setForeground(QBrush(QColor(0,0,0)));
     if (index.data(3).toBool())
     { //is topic        
-        //index.setForeground(QBrush(QColor(0,0,0)));
-        displayedData = const_cast<QModelIndex &>(index);
+        
+        displayedData = const_cast<QModelIndex &>(index);   
         QString stringData = "";
         /*data_type_t*/ int type = index.data(5).toList().at(0).toInt();
         if ((type == STRING) || (type == JSON))
