@@ -1,12 +1,24 @@
+/**
+ * @file	mqtt_client.cpp
+ * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+ *
+ * @brief	MQTT client to utilize MQTT protocol
+ */
+
 #include "mqtt_client.h"
 #include <ctime>    // time
 #include <unistd.h> // getpid, fcntl
 #include <fcntl.h>  // fcntl
-#include <iomanip>  // setw, internal, setfill; DELLETE LATER
 #include <iostream>
 
-
-// REWORK timeout on pending acks & resend
+/**
+ * @def 	INSERT_REM_LEN
+ * @brief	Inserts remaining length according to MQTT protocol into a string
+ *
+ * @def 	INSERT_2B_LEN
+ * @brief	Inserts 2 byte value into a string
+ *
+ */
 
 #define INSERT_REM_LEN(len, packet)            \
 	while(len != 0){                           \
@@ -31,32 +43,6 @@ MQTT_Client::MQTT_Client(client_t info)
 MQTT_Client::~MQTT_Client(){
 	int retval = broker_disconnect();
 	if(retval) std::cerr << "Broker already disconnected : " << retval << std::endl;
-}
-
-void _print_packet(const uint8_t* received_packet, int size){
-	std::string tmp_buf = "";
-			std::cout << tmp_buf << std::endl;
-	for(int i = 0; i < size; i++){
-		if(i%16 == 0){
-			std::cout << " "<< tmp_buf << std::endl;
-			tmp_buf.clear();
-		}
-		std::cout << std::internal << std::setfill('0');
-		std::cout << std::hex << std::setw(2) << static_cast<uint16_t>(received_packet[i]) << " ";
-		if(received_packet[i] >= 32) tmp_buf += received_packet[i];
-		else tmp_buf += '.';
-	}
-
-	for(int i = 0; i < size%16; i++){
-		std::cout << "  ";
-	}
-	std::cout << " "<< tmp_buf << std::endl;
-
-	std::cout << std::dec << std::endl;
-}
-template<typename T>
-void print_packet(std::basic_string<T>& tmp){
-	_print_packet(reinterpret_cast<const uint8_t*>(tmp.c_str()), tmp.size());
 }
 
 int MQTT_Client::broker_connect(client_t info){
@@ -174,9 +160,7 @@ int MQTT_Client::publish(const std::string& topic, const std::string& value, pub
 	}
 
 	/// Create payload
-	for(int i = 0; i < value.length(); i++){
-		publish_packet += value[i];
-	}
+	publish_packet += value;
 	
 	/// Send the packet
 	int retval = tcp_send(publish_packet.c_str(), publish_packet.length());
@@ -275,8 +259,8 @@ int MQTT_Client::mqtt_recv(int timeout){
 
 	/// Set up timeout in case the server doesnt respond
 	int retval = select(tcp_socket+1, &read_socket, NULL, NULL, &timer);
-	if(retval < 0) return retval-10;       // Error
-	else if(retval == 0) return -2; // Timeout
+	if(retval < 0) return retval-10; // Error
+	else if(retval == 0) return -2;  // Timeout
 
 	/// Load an MQTT packet
 	/// Control header
@@ -320,6 +304,12 @@ bool MQTT_Client::get_connected(){
 	return connected;
 }
 
+/**
+ * @brief	Splits a string into a pair divided by '/'
+ * @param	path	String containing path to split
+ * @return
+ *		- Pair of strings
+ */
 std::pair<std::string,std::string> getPath(std::string path){
 	std::string delimiter = "/";
 	std::string name = path.substr(0, path.find(delimiter));
@@ -327,6 +317,11 @@ std::pair<std::string,std::string> getPath(std::string path){
 	return std::make_pair(name, path);
 }
 
+/**
+ * @brief	Recursive helper function that finds the QModelIndex
+ * @param	item	Element of traversed tree model
+ * @param	topic	Path to the element
+ */
 QModelIndex _topic_find(QStandardItem* item, std::string& topic){
 	QModelIndex blank = QModelIndex();
 	if(item == NULL) return blank;
@@ -368,6 +363,10 @@ QModelIndex MQTT_Client::topic_find(std::string& topic){
 	return blank;
 }
 
+/**
+ * @brief	Mainloop of receiving thread
+ * @param	client	Reference to receiving client
+ */
 void continuous_receive(MQTT_Client& client){
 	int retval;
 	time_t last_ping = time(0);
@@ -475,14 +474,13 @@ int MQTT_Client::rm_ack(std::tuple<PacketType, uint16_t> ack){
 	return 0;
 }
 
-int MQTT_Client::rm_packet_id(uint16_t packet_id){
+void MQTT_Client::rm_packet_id(uint16_t packet_id){
 	for(unsigned int i = 0; i < unavailable_packet_id.size(); i++){
 		if(unavailable_packet_id[i] == packet_id){
 			unavailable_packet_id.erase(unavailable_packet_id.begin() + i);
 			break;
 		}
 	}
-	return 0;
 }
 
 int MQTT_Client::received_data(ustring& received_packet){
@@ -595,10 +593,17 @@ int MQTT_Client::received_data(ustring& received_packet){
 	return 0;
 }
 
+/**
+ * @brief	Recognises .jpg and .png files
+ * @param	data	File to recognize
+ * @return
+ *		- STRING
+ *		- BIN
+ */
 data_type_t data_type(std::string& data){
-	if(static_cast<uint8_t>(data[0]) == 0xFF &&
+	if(static_cast<uint8_t>(data[0]) == 0xFF && // JPEG
 	   static_cast<uint8_t>(data[1]) == 0xD8 &&
-	   static_cast<uint8_t>(data[2]) == 0xFF) // JPEG
+	   static_cast<uint8_t>(data[2]) == 0xFF)
 		return BIN;
 	else if(static_cast<uint8_t>(data[0]) == 137 && // PNG
 			static_cast<uint8_t>(data[1]) == 80 &&
@@ -612,6 +617,16 @@ data_type_t data_type(std::string& data){
 	return STRING;
 }
 
+/**
+ * @brief	Recursive helper function that updates an element or inserts a new one
+ * @param	item	Element of traversed tree model
+ * @param	name	Path to topic element
+ * @param	value	Topic data
+ * @param	depth	Current depth of traversed branch
+ * @return
+ *		- 0
+ *		- -1
+ */
 int update_topic(QStandardItem* item, std::string& name, std::string value, int depth){
 	if(item == NULL || depth < 0) return -1;
 	usleep(5);
