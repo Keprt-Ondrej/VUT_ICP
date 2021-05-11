@@ -65,7 +65,7 @@ void ConnectServer::connectToServer()
                 success = false;
             }
 
-            int index = 0;
+            unsigned int index = 0;
             for(unsigned int i = 0; i < topics.length(); i++) //subscribe to all given topics 
             {
                 if(topics[i] == '\n')

@@ -255,6 +255,26 @@ class MQTT_Client : private TCP_Client{
 		 *		- -1
 		 */
 		int stop_receiving();
+		
+		/**
+		 * @brief	Updates shown tree model or inserts a new element
+         * 
+         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+         * 
+		 * @param	packet	Raw PUBLISH packet
+		 */
+		void update_tree(ustring& packet);
+		
+		/**
+		 * @brief	Updates shown tree model or inserts a new element
+         * 
+         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+         * 
+		 * @param	topic		Path to topic element
+		 * @param	value		Topic data
+		 * @param	received	Flag to signalize if the topic was received or published
+		 */
+		void update_tree(const std::string& topic, const std::string& value, bool received);
 
 	private:
 
@@ -338,15 +358,6 @@ class MQTT_Client : private TCP_Client{
 		int received_data(ustring& received_packet);
 
 		/**
-		 * @brief	Updates shown tree model or inserts a new element
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
-		 * @param	packet	Raw PUBLISH packet
-		 */
-		void update_tree(ustring& packet);
-
-		/**
 		 * @brief	Recursively removes and frees all elements from shown three model
 		 * @param	item	Pointer to tree model elements
          * 
@@ -360,6 +371,5 @@ class MQTT_Client : private TCP_Client{
 		QStandardItemModel* tree_root; ///< Pointer to shown tree model
 		std::vector<std::tuple<PacketType, uint16_t>> pending_ack; ///< Queue of pairs containting packet type and packet ID
 		std::vector<uint16_t> unavailable_packet_id;               ///< List of packet IDs in use
-
 };
 #endif // MQTT_CLIENT_H

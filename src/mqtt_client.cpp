@@ -609,7 +609,7 @@ int MQTT_Client::received_data(ustring& received_packet){
  *		- STRING
  *		- BIN
  */
-data_type_t data_type(std::string& data){
+data_type_t data_type(const std::string& data){
 	if(static_cast<uint8_t>(data[0]) == 0xFF && // JPEG
 	   static_cast<uint8_t>(data[1]) == 0xD8 &&
 	   static_cast<uint8_t>(data[2]) == 0xFF)
@@ -637,7 +637,7 @@ data_type_t data_type(std::string& data){
  *		- 0
  *		- -1
  */
-int update_topic(QStandardItem* item, std::string& name, std::string value, int depth){
+int update_topic(QStandardItem* item, const std::string& name, const std::string value, int depth){
 	if(item == NULL || depth < 0) return -1;
 	usleep(5);
 	std::pair<std::string,std::string> path = getPath(name);
@@ -721,7 +721,6 @@ void MQTT_Client::update_tree(ustring& packet){
 
 	/// Find/create topic
 	std::string topic;
-	int depth = 0;
 	//uint32_t remaining_length = from_remaining_len(&(packet.c_str()[1]));
 	int t_index = 0;
 	if(packet[1]&0x80){
@@ -737,14 +736,22 @@ void MQTT_Client::update_tree(ustring& packet){
 	uint16_t topic_len = (packet[t_index] << 8) | packet[t_index+1];
 	for(uint16_t i = 0; i < topic_len; i++){
 		topic += packet[t_index+2+i];
-		if(packet[t_index+2+i] == '/') depth++;
 	}
 
-	std::cout << topic << std::endl;
+	//std::cout << topic << std::endl;
 	
 	std::string value = "";
 	for(unsigned int i = 2+t_index+topic_len; i < packet.length(); i++){
 		value += packet[i];
+	}
+
+	update_tree(topic, value, true);
+}
+
+void MQTT_Client::update_tree(const std::string& topic, const std::string& value, bool received){
+	int depth = 0;
+	for(uint16_t i = 0; i < topic.length(); i++){
+		if(topic[i] == '/') depth++;
 	}
 
 	int retval = -1;
