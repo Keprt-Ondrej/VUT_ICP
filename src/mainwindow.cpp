@@ -27,7 +27,14 @@ MainWindow::MainWindow(MQTT_Client &mqtt, QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("MQTT EXPLORER");
-    tree_model = new QStandardItemModel();
+    try{
+        tree_model = new QStandardItemModel();
+    }
+    catch(...){
+        qInfo() << "Bad alloc main window";
+        return;
+    }
+    
     sharedMqtt.set_tree_root(tree_model);
     ui->TreeView->setModel(tree_model);
     simulate = ui->toolBar->actions().at(8);    
@@ -40,8 +47,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionConnect_server_triggered()
 {
-    connectServerNewWindow(sharedMqtt);
-    
+    connectServerNewWindow(sharedMqtt);    
     tree_model = new QStandardItemModel();
     sharedMqtt.set_tree_root(tree_model);
     ui->TreeView->setModel(tree_model);

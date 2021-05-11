@@ -68,64 +68,82 @@ void DashBoard::on_addWidget_released()
         return;
     }
 
-    QString widgetType = ui->widgetType->currentText();
-    QHBoxLayout *newWidget = new QHBoxLayout(nullptr); 
+    QPushButton* removeButton = nullptr;
+    QHBoxLayout *newWidget = nullptr;
+    QTextBrowser *widgetDescription = nullptr; 
+    QLabel *icon = nullptr;
+    QTextBrowser *data = nullptr;
+    QPushButton* publisButton = nullptr;
+    try{
+        QString widgetType = ui->widgetType->currentText();
+        
+        newWidget = new QHBoxLayout(nullptr); 
+        
+        icon = new QLabel("",nullptr);      
+        icon->setMaximumSize(100,100);    
+        if (widgetType == "temperature"){
+            icon->setPixmap(thermometherPNG);
+        }
+        else if (widgetType == "wattmeter"){
+            icon->setPixmap(wattPNG);       
+        }
+        else if(widgetType == "humidity meter"){
+            icon->setPixmap(humidityPNG);        
+        }
+        else if (widgetType == "relay"){
+            icon->setPixmap(relayPNG);        
+        }
+        else if (widgetType == "blank"){
+            icon->setStyleSheet("QLabel{background : transparent}");
+            icon->setMinimumSize(100,100);
+        }
+        else if (widgetType == "lever"){
+            icon->setPixmap(leverPNG);
+        } 
+        else{
+            icon->setPixmap(detectorPNG);
+        }    
+        newWidget->addWidget(icon);
+            
+        widgetDescription = new QTextBrowser(nullptr);
+        widgetDescription->setText(ui->description->toPlainText());    
+        widgetDescription->setStyleSheet("QTextBrowser{background : transparent;text-align:center;}");    //widgetDescription->setStyleSheet("QTextBrowser{background : transparent}");
+        widgetDescription->setMaximumSize(400,100);
+        newWidget->addWidget(widgetDescription);        
+            
+        data = new QTextBrowser(nullptr);       
+        data->setStyleSheet("QTextBrowser{background : transparent;text-align:center;}");
+        data->setText(dataIndex.data(6).toList().at(0).toString());
+        data->setMaximumSize(1500,100);    
+        newWidget->addWidget(data);   
+            
+        publisButton = new QPushButton("Publish",nullptr);  
+        publisButton->setStyleSheet("QPushButton:pressed{	background-color: #00FF00}");
+        mapPublishButtonToTopicPath.insert(publisButton,QTopicPath);
+        connect(publisButton,&QPushButton::released,this,&DashBoard::publishTopic);  
+        publisButton->setMaximumSize(100,30);    
+        newWidget->addWidget(publisButton);
+            
+        removeButton = new QPushButton("Remowe widget",nullptr);  
+        removeButton->setStyleSheet("QPushButton:pressed{	background-color: #00FF00}");
+        QObject::connect(removeButton,&QPushButton::released,this,&DashBoard::removeWidget);        
+        removeButton->setMaximumSize(120,30);
+        mapButtonToLayout.insert(removeButton,newWidget);     //for proper deleting all widgets
+        newWidget->addWidget(removeButton);
 
-    QLabel *icon = new QLabel("",nullptr);    
-    icon->setMaximumSize(100,100);    
-    if (widgetType == "temperature"){
-        icon->setPixmap(thermometherPNG);
+        mapDataToDisplay.insert(newWidget,dataIndex);  
+        layout->insertLayout(0,newWidget);
     }
-    else if (widgetType == "wattmeter"){
-        icon->setPixmap(wattPNG);       
-    }
-    else if(widgetType == "humidity meter"){
-        icon->setPixmap(humidityPNG);        
-    }
-    else if (widgetType == "relay"){
-        icon->setPixmap(relayPNG);        
-    }
-    else if (widgetType == "blank"){
-        icon->setStyleSheet("QLabel{background : transparent}");
-        icon->setMinimumSize(100,100);
-    }
-    else if (widgetType == "lever"){
-        icon->setPixmap(leverPNG);
-    } 
-    else{
-        icon->setPixmap(detectorPNG);
+    catch(...){
+        delete newWidget;
+        delete icon;
+        delete widgetDescription;
+        delete data;
+        delete publisButton;
+        delete removeButton;
+        qInfo() << "BadAlloc";
+        return;
     }    
-    newWidget->addWidget(icon);   
-   
-    
-    QTextBrowser *widgetDescription = new QTextBrowser(nullptr);
-    widgetDescription->setText(ui->description->toPlainText());    
-    widgetDescription->setStyleSheet("QTextBrowser{background : transparent;text-align:center;}");    //widgetDescription->setStyleSheet("QTextBrowser{background : transparent}");
-    widgetDescription->setMaximumSize(400,100);
-    newWidget->addWidget(widgetDescription);
-    
-    QTextBrowser *data = new QTextBrowser(nullptr);       
-    data->setStyleSheet("QTextBrowser{background : transparent;text-align:center;}");
-    data->setText(dataIndex.data(6).toList().at(0).toString());
-    data->setMaximumSize(1500,100);    
-    newWidget->addWidget(data);   
-
-    QPushButton* publisButton = new QPushButton("Publish",nullptr);  
-    publisButton->setStyleSheet("QPushButton:pressed{	background-color: #00FF00}");
-    mapPublishButtonToTopicPath.insert(publisButton,QTopicPath);
-    connect(publisButton,&QPushButton::released,this,&DashBoard::publishTopic);  
-    publisButton->setMaximumSize(100,30);    
-    newWidget->addWidget(publisButton);
-
-    QPushButton* removeButton = new QPushButton("Remowe widget",nullptr);  
-    removeButton->setStyleSheet("QPushButton:pressed{	background-color: #00FF00}");
-    QObject::connect(removeButton,&QPushButton::released,this,&DashBoard::removeWidget);        
-    removeButton->setMaximumSize(120,30);
-    mapButtonToLayout.insert(removeButton,newWidget);     //for proper deleting all widgets
-    newWidget->addWidget(removeButton);
-
-    mapDataToDisplay.insert(newWidget,dataIndex);  
-    layout->insertLayout(0,newWidget);
 }
 
 void DashBoard::removeWidget()

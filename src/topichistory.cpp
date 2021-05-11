@@ -16,27 +16,40 @@ TopicHistory::TopicHistory(QModelIndex &dataHistory,QWidget *parent) :
     dataHistory(dataHistory)
 {  
     ui->setupUi(this);   
-    
-    QStandardItemModel* model = new QStandardItemModel();     
-    ui->path->setText(dataHistory.data(7).toString());
+    QStandardItemModel* model = nullptr;
+    QStandardItem* item = nullptr;
+    std::vector<QStandardItem*> pointers;
+    try{
+        model = new QStandardItemModel();     
+        ui->path->setText(dataHistory.data(7).toString());
 
-    QList<QVariant> dataType =  dataHistory.data(5).toList();
-    QList<QVariant> data =  dataHistory.data(6).toList();    
-    QStandardItem* item = new QStandardItem("actual version"); 
-    item->setData(dataType.at(0),5);
-    item->setData(data.at(0),6);
-    versions.push_back(item);    
-    model->appendRow(item);
-    int dataSize = data.size();
-    for (int i = 1; i < dataSize;i++){
-        item = new QStandardItem("version "+ QString::number(i));
-        item->setData(dataType.at(i),5);
-        item->setData(data.at(i),6);
-        versions.push_back(item);
+        QList<QVariant> dataType =  dataHistory.data(5).toList();
+        QList<QVariant> data =  dataHistory.data(6).toList();    
+        item = new QStandardItem("actual version"); 
+        pointers.push_back(item);
+        item->setData(dataType.at(0),5);
+        item->setData(data.at(0),6);
+        versions.push_back(item);    
         model->appendRow(item);
+        int dataSize = data.size();
+        for (int i = 1; i < dataSize;i++){
+            item = new QStandardItem("version "+ QString::number(i));
+            pointers.push_back(item);
+            item->setData(dataType.at(i),5);
+            item->setData(data.at(i),6);
+            versions.push_back(item);
+            model->appendRow(item);
+        }
+        
+        ui->versions->setModel(model);
     }
-    
-    ui->versions->setModel(model);
+    catch(...){
+        delete model;        
+        for(long unsigned int i = 0;i < pointers.size();i++){
+            item = pointers[i];
+            delete item;
+        }
+    }
 }
 
 TopicHistory::~TopicHistory()
