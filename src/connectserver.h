@@ -49,6 +49,7 @@ private slots:
      * @sa call function broker_connect
      * 
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+     * @author Matúš Fabo (xfabom01@stud.fit.vutbr.cz)
     */
     void connectToServer();
 };
@@ -56,7 +57,7 @@ private slots:
 /**
  * @brief Open new window to select new server
  * 
- * @param mqtt shared data
+ * @param mqtt Reference on application shared data
  * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
 */
 void connectServerNewWindow(MQTT_Client &mqtt);

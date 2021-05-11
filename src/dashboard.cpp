@@ -27,8 +27,8 @@ DashBoard::DashBoard(MQTT_Client &mqtt,QWidget *parent) :
     relayPNG("icons/relay.png"),
     mqtt(mqtt)
 {    
-    connect(this, SIGNAL(dataChanged()), this, SLOT(updateGUI()));
     ui->setupUi(this); 
+    //connect(this, SIGNAL(dataChanged()), this, SLOT(updateGUI()));    
     connect(ui->update, SIGNAL(clicked()), this, SLOT(updateGUI()));      
     layout = qobject_cast<QVBoxLayout*>(ui->widgets_frame->layout());    
 }
@@ -72,7 +72,7 @@ void DashBoard::on_addWidget_released()
     QHBoxLayout *newWidget = new QHBoxLayout(nullptr); 
 
     QLabel *icon = new QLabel("",nullptr);    
-    icon->setMaximumSize(100,100);
+    icon->setMaximumSize(100,100);    
     if (widgetType == "temperature"){
         icon->setPixmap(thermometherPNG);
     }
@@ -87,6 +87,7 @@ void DashBoard::on_addWidget_released()
     }
     else if (widgetType == "blank"){
         icon->setStyleSheet("QLabel{background : transparent}");
+        icon->setMinimumSize(100,100);
     }
     else if (widgetType == "lever"){
         icon->setPixmap(leverPNG);
@@ -112,7 +113,7 @@ void DashBoard::on_addWidget_released()
     QPushButton* publisButton = new QPushButton("Publish",nullptr);  
     publisButton->setStyleSheet("QPushButton:pressed{	background-color: #00FF00}");
     mapPublishButtonToTopicPath.insert(publisButton,QTopicPath);
-    connect(publisButton,&QPushButton::released,this,&DashBoard::updateTopic);   //SLOT(updateTopic(topicPath))      mapPublishButtonToTopicPath.value(publishButton))
+    connect(publisButton,&QPushButton::released,this,&DashBoard::publishTopic);  
     publisButton->setMaximumSize(100,30);    
     newWidget->addWidget(publisButton);
 
@@ -159,8 +160,7 @@ void DashBoard::updateGUI(){
     }
 }
 
-void DashBoard::updateTopic(){
-    //std::string path = topicPath.toUtf8().constData();
+void DashBoard::publishTopic(){    
     QPushButton* button = qobject_cast<QPushButton*>(sender());
     QString path = mapPublishButtonToTopicPath.value(button);
     QString data = "";

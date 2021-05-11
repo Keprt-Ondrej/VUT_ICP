@@ -14,9 +14,8 @@
 
 class MQTT_Client; // forward declaration for proper compiling
 
-///\todo https://csfieldguide.org.nz/en/interactives/rgb-mixer/ color setup
-const QColor receivedColor = QColor(250, 0, 0);
-const QColor sendColor = QColor(0, 200, 0);
+const QColor receivedColor = QColor(0, 200, 0);
+const QColor sendColor = QColor(255, 200, 0);
 
 /**
  * @brief Main functionality of application GUI

@@ -97,8 +97,7 @@ void ConnectServer::connectToServer()
 
     //fail to connect
     QMessageBox messageBox;
-    messageBox.setFixedSize(500, 200);
-    ///< \todo dodelat switch na ruzne error msg
+    messageBox.setFixedSize(500, 200);    
     messageBox.critical(0, "Error", "Broker connection failed!");
 }
 

@@ -41,34 +41,43 @@ public slots:
      * 
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
-    void updateGUI();    
+    void updateGUI(); 
 
-signals:
+private slots:
     /**
-     * @brief Signa
+     * @brief Create widget dinamically for topic
      * 
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
-    void dataChanged();
-
-private slots:
     void on_addWidget_released();
+    
+    /**
+     * @brief Remove widget from dashboard
+     * 
+     * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+    */
     void removeWidget();
-    void updateTopic();
+
+    /**
+     * @brief Open window for updating data for specified topic
+     * 
+     * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+    */
+    void publishTopic();
 
 private:
-    Ui::DashBoard *ui; 
-    QVBoxLayout *layout;  
-    QHash<QPushButton*,QHBoxLayout*> mapButtonToLayout; 
-    QPixmap thermometherPNG;
-    QPixmap humidityPNG;
-    QPixmap wattPNG;
-    QPixmap leverPNG;
-    QPixmap detectorPNG;
-    QPixmap relayPNG;
-    MQTT_Client &mqtt;
-    QHash<QHBoxLayout*,QModelIndex> mapDataToDisplay; 
-    QHash<QPushButton*,QString> mapPublishButtonToTopicPath;   
+    Ui::DashBoard *ui;                                          ///< Pointer to UI
+    QVBoxLayout *layout;                                        ///< Pointer to layout, where widgets for topics are stored
+    QHash<QPushButton*,QHBoxLayout*> mapButtonToLayout;         ///< Map button on widget layout for proper deleting all items in widget
+    QPixmap thermometherPNG;                                    ///< Icon for widged thermomether                                    
+    QPixmap humidityPNG;                                        ///< Icon for widged humidity meter   
+    QPixmap wattPNG;                                            ///< Icon for widged wattmeter
+    QPixmap leverPNG;                                           ///< Icon for widged lever/button
+    QPixmap detectorPNG;                                        ///< Icon for widged detector   
+    QPixmap relayPNG;                                           ///< Icon for widged relay
+    MQTT_Client &mqtt;                                          ///< Reference on application shared memory 
+    QHash<QHBoxLayout*,QModelIndex> mapDataToDisplay;           ///< Map index in memory, where are stored data for widget
+    QHash<QPushButton*,QString> mapPublishButtonToTopicPath;    ///< Map widget button to path topic path    
 };
 
 #endif // DASHBOARD_H
