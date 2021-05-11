@@ -9,3 +9,16 @@ Matúš Fabo (xfabom01@stud.fit.vutbr.cz)
 Ondřej Keprt (xkeprt03@stud.fit.vutbr.cz)
 
 Spustitelný soubor se jmenuje mqttexp
+
+
+Implementace:
+
+Program nebere zadny argumenty a neuklada/nenacte zadny soubory (krome souboru, ktere se posilaji brokeru)
+
+MQTT Klient je delan rucne a kdyz je prilis mnoho prichozich paketu, tak spadne (napriklad kdyz se odoberaji vsechny topicy na testovacich servrech)
+
+Simulator je zakomponovany do normalniho klienta a jenom posila spravy s vynimkou obrazku (obrazky ale lze posilat)
+
+Dashboard se nam nepodaril automaticky obnovovat, tak se musi rucne obnovit tlacidlem update.
+
+Vse ostatni by melo jit podle zadani.
