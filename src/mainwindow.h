@@ -119,7 +119,11 @@ private slots:
     */
     void on_actionDisconnect_triggered();
 
-    
+    /**
+     * @brief Call funcion for starting traffic simulation
+     * 
+     * @author Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+    */    
     void on_actionSimulate_triggered();
 };
 
