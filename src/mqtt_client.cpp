@@ -37,7 +37,7 @@ void _print_packet(const uint8_t* received_packet, int size){
 	std::string tmp_buf = "";
 			std::cout << tmp_buf << std::endl;
 	for(int i = 0; i < size; i++){
-		if(i%8 == 0){
+		if(i%16 == 0){
 			std::cout << " "<< tmp_buf << std::endl;
 			tmp_buf.clear();
 		}
@@ -47,8 +47,8 @@ void _print_packet(const uint8_t* received_packet, int size){
 		else tmp_buf += '.';
 	}
 
-	for(int i = 0; i < size%8; i++){
-		std::cout << "   ";
+	for(int i = 0; i < size%16; i++){
+		std::cout << "  ";
 	}
 	std::cout << " "<< tmp_buf << std::endl;
 
@@ -149,7 +149,7 @@ int MQTT_Client::broker_disconnect(){
 }
 
 int MQTT_Client::publish(const std::string& topic, const std::string& value, pubflg_t opt){
-	if(!connected || topic.length() == 0 || topic.length() > 0xFFFF || value.length() > 0xFFFF || opt.QoS >= 3)
+	if(!connected || topic.length() == 0 || topic.length() > 0xFFFF || value.length() > 0x7FFFFFF || opt.QoS >= 3)
 		return -1;
 
 	/// Create PUBLISH packet
@@ -174,8 +174,10 @@ int MQTT_Client::publish(const std::string& topic, const std::string& value, pub
 	}
 
 	/// Create payload
-	publish_packet += value;
-
+	for(int i = 0; i < value.length(); i++){
+		publish_packet += value[i];
+	}
+	
 	/// Send the packet
 	int retval = tcp_send(publish_packet.c_str(), publish_packet.length());
 	if(retval) return retval-10;
@@ -187,7 +189,6 @@ int MQTT_Client::publish(const std::string& topic, const std::string& value, pub
 	return 0;
 }
 
-// REWORK (un)subscribe multiple topics in one packet
 int MQTT_Client::subscribe(const std::string& topic){
 	if(!connected) return -1;
 	/// Create SUBSCRIBE packet
@@ -368,12 +369,11 @@ QModelIndex MQTT_Client::topic_find(std::string& topic){
 }
 
 void continuous_receive(MQTT_Client& client){
-	std::cout << "Started listening\n";
 	int retval;
 	time_t last_ping = time(0);
 	while(client.get_connected()){
 		retval = client.mqtt_recv(50);
-		if(retval == -2 || last_ping+50 <= time(0)){
+		if(retval == -2 || last_ping+45 <= time(0)){
 			std::cerr << "MQTT timeout.\n";
 			client.ping();
 			last_ping = time(0);
@@ -511,6 +511,7 @@ int MQTT_Client::received_data(ustring& received_packet){
 
 		case PUBLISH:
 			std::cout << "PUBLISH arrived.\n";
+			//print_packet(received_packet);
 			qos = (received_packet[0]&0b0110) >> 1;
 			update_tree(received_packet);
 			if(qos != 0){
@@ -612,8 +613,8 @@ data_type_t data_type(std::string& data){
 }
 
 int update_topic(QStandardItem* item, std::string& name, std::string value, int depth){
-	usleep(5);
 	if(item == NULL || depth < 0) return -1;
+	usleep(5);
 	std::pair<std::string,std::string> path = getPath(name);
 	static std::string full_path = "";
 	full_path += item->data(0).toString().toStdString() + "/";
@@ -643,8 +644,16 @@ int update_topic(QStandardItem* item, std::string& name, std::string value, int 
 				QList<QVariant> my_list;
 				QList<QVariant> my_list_types;
 
-				my_list.push_front(QString::fromStdString(value));
-				my_list_types.push_front(data_type(value));
+				data_type_t tmp = data_type(value);
+				if(tmp == BIN){
+					my_list.push_front(QByteArray(value.c_str(), value.length()));
+					my_list_types.push_front(tmp);
+				}
+				else{
+					my_list.push_front(QString::fromStdString(value));
+					my_list_types.push_front(data_type(value));
+				}
+
 
 				item->setData(true, 3);
 				item->setData(true, 4);
@@ -653,6 +662,7 @@ int update_topic(QStandardItem* item, std::string& name, std::string value, int 
 				item->setData(QString::fromStdString(full_path), 7);
 				item->setForeground(QBrush(QColor(250,0,0)));
 				full_path.clear();
+
 				return 0;
 			}
 		}
@@ -660,8 +670,16 @@ int update_topic(QStandardItem* item, std::string& name, std::string value, int 
 			QList<QVariant> my_list_types = item->data(5).toList();
 			QList<QVariant> my_list = item->data(6).toList();
 
-			my_list_types.push_front(data_type(value));
-			my_list.push_front(QString::fromStdString(value));
+			data_type_t tmp = data_type(value);
+			if(tmp == BIN){
+				my_list.push_front(QByteArray(value.c_str(), value.length()));
+				my_list_types.push_front(tmp);
+			}
+			else{
+				my_list.push_front(QString::fromStdString(value));
+				my_list_types.push_front(data_type(value));
+			}
+
 			item->setData(my_list_types, 5);
 			item->setData(my_list, 6);
 			item->setForeground(QBrush(QColor(250,0,0)));
@@ -679,11 +697,11 @@ void MQTT_Client::update_tree(ustring& packet){
 	/// Find/create topic
 	std::string topic;
 	int depth = 0;
-	uint32_t remaining_length = from_remaining_len(&(packet.c_str()[1]));
+	//uint32_t remaining_length = from_remaining_len(&(packet.c_str()[1]));
 	int t_index = 0;
-	if(remaining_length >= 0x80){
-		if(remaining_length >= 0x8000){
-			if(remaining_length >= 0x800000)
+	if(packet[1]&0x80){
+		if(packet[2]&0x80){
+			if(packet[3]&0x80)
 				t_index = 5;
 			else t_index = 4;
 		}
@@ -693,12 +711,12 @@ void MQTT_Client::update_tree(ustring& packet){
 
 	uint16_t topic_len = (packet[t_index] << 8) | packet[t_index+1];
 	for(uint16_t i = 0; i < topic_len; i++){
-		topic += packet[4+i];
-		if(packet[4+i] == '/') depth++;
+		topic += packet[t_index+2+i];
+		if(packet[t_index+2+i] == '/') depth++;
 	}
 
-	//std::cout << ((topic_find(topic) != QModelIndex())?("Topic found"):("Go to hell")) << std::endl;
-
+	std::cout << topic << std::endl;
+	
 	std::string value = "";
 	for(unsigned int i = 2+t_index+topic_len; i < packet.length(); i++){
 		value += packet[i];
@@ -739,8 +757,15 @@ void MQTT_Client::update_tree(ustring& packet){
 		QList<QVariant> my_list;
 		QList<QVariant> my_list_types;
 
-		my_list.push_front(QString::fromStdString(value));
-		my_list_types.push_front(data_type(value));
+		data_type_t tmp = data_type(value);
+		if(tmp == BIN){
+			my_list.push_front(QByteArray(value.c_str(), value.length()));
+			my_list_types.push_front(tmp);
+		}
+		else{
+			my_list.push_front(QString::fromStdString(value));
+			my_list_types.push_front(data_type(value));
+		}
 
 		item->setData(true, 3);
 		item->setData(true, 4);
