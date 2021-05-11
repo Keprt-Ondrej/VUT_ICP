@@ -26,7 +26,7 @@ public:
      * @brief Construct a new Show Binary Data object
      * 
      * @param data Reference to binary data
-     * @param parent 
+     * @param parent parent window
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
     explicit ShowBinaryData(QByteArray &data,QWidget *parent = nullptr);

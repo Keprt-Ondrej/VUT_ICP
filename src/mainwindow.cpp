@@ -158,3 +158,9 @@ void MainWindow::on_actionDashboard_triggered()
     dashBoard.setWindowTitle("Dash Board");  
     dashBoard.exec();   
 }
+
+void MainWindow::on_actionDisconnect_triggered()
+{
+    sharedMqtt.broker_disconnect();
+    
+}

@@ -25,21 +25,21 @@ class NewAndEditTopic : public QDialog
 
 public:
     /**
-     * @brief Construct a new NewAndEditTopic window when someone want edit topic
+     * @brief Construct a new NewAndEditTopic window when someone want publish edited data
      * 
      * @param mqtt Application shared data
      * @param path Topic path on server
      * @param data Topic data to edit
-     * @param parent 
+     * @param parent parent window
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
     explicit NewAndEditTopic(MQTT_Client &mqtt,QString &path,QString &data,QWidget *parent);
 
     /**
-     * @brief Construct a new NewAndEditTopic window when someone want create new topic
+     * @brief Construct a new NewAndEditTopic window when someone want publish new data
      * 
      * @param mqtt Application shared data
-     * @param parent 
+     * @param parent parent window
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
     explicit NewAndEditTopic(MQTT_Client &mqtt,QWidget *parent);

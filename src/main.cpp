@@ -20,21 +20,17 @@
 #include <iostream>
 #include <ctime>
 
-/*! \mainpage My Personal Index Page
+/**
+ * @brief Data inicialization and connecting to broker
+ * 
+ * @param argc Argument counter
+ * @param argv Program arguments 
  *
- * \section intro_sec Introduction
- *
- * This is the introduction.
- *
- * \section install_sec Installation
- *
- * \subsection step1 Step 1: Opening the box
- *
- * etc...
- */
-
-
-
+ * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+ * @author Matúš Fabo (xfabom01@stud.fit.vutbr.cz)
+ * 
+ * @return int exit code
+*/
 int main(int argc, char *argv[]) {  
 	QApplication a(argc, argv);
 

@@ -1,6 +1,7 @@
 /**
  * @file connectserver.cpp
  * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
+ * @author Matúš Fabo (xfabom01@stud.fit.vutbr.cz)
  * 
  * @brief Definition of class for connecting to new server
  * 

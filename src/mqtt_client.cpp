@@ -14,9 +14,11 @@
 /**
  * @def 	INSERT_REM_LEN
  * @brief	Inserts remaining length according to MQTT protocol into a string
+ * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
  *
  * @def 	INSERT_2B_LEN
  * @brief	Inserts 2 byte value into a string
+ * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
  *
  */
 
@@ -307,6 +309,8 @@ bool MQTT_Client::get_connected(){
 /**
  * @brief	Splits a string into a pair divided by '/'
  * @param	path	String containing path to split
+ * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz) 
+ * 
  * @return
  *		- Pair of strings
  */
@@ -321,6 +325,8 @@ std::pair<std::string,std::string> getPath(std::string path){
  * @brief	Recursive helper function that finds the QModelIndex
  * @param	item	Element of traversed tree model
  * @param	topic	Path to the element
+ * 
+ * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
  */
 QModelIndex _topic_find(QStandardItem* item, std::string& topic){
 	QModelIndex blank = QModelIndex();
@@ -366,6 +372,8 @@ QModelIndex MQTT_Client::topic_find(std::string& topic){
 /**
  * @brief	Mainloop of receiving thread
  * @param	client	Reference to receiving client
+ * 
+ * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
  */
 void continuous_receive(MQTT_Client& client){
 	int retval;
@@ -596,6 +604,7 @@ int MQTT_Client::received_data(ustring& received_packet){
 /**
  * @brief	Recognises .jpg and .png files
  * @param	data	File to recognize
+ * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
  * @return
  *		- STRING
  *		- BIN
@@ -623,6 +632,7 @@ data_type_t data_type(std::string& data){
  * @param	name	Path to topic element
  * @param	value	Topic data
  * @param	depth	Current depth of traversed branch
+ * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
  * @return
  *		- 0
  *		- -1

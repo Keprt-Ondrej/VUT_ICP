@@ -27,7 +27,7 @@ public:
      * 
      * @param data Reference to text data, which should be displayed
      * @param path Reference to Topic path on the server
-     * @param parent 
+     * @param parent parent window
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
     explicit fullTextWindow(QString &data,QString &path,QWidget *parent = nullptr);

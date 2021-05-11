@@ -14,12 +14,16 @@ typedef std::basic_string<unsigned char> ustring;
 
 /**
  * @brief	Simple TCP communication client
+ * 
+ * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
  */
 class TCP_Client{
 	public:
 
 		/**
 		 * @brief	Class constructor
+         * 
+         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 */
 		TCP_Client();
 
@@ -27,11 +31,15 @@ class TCP_Client{
 		 * @brief	Class constructor
 		 * @param	hostname	Hostname or IP address of the server
 		 * @param	port		Port of the server
+         * 
+         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 */
 		TCP_Client(const std::string& hostname, int port);
 
 		/**
 		 * @brief	Class destructor
+         * 
+         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 */
 		~TCP_Client();
 		
@@ -40,6 +48,8 @@ class TCP_Client{
 		 * @brief	Connects to a server
 		 * @param	hostname	Hostname or IP address of the server
 		 * @param	port		Port of the server
+         * 
+         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * @return 
 		 *		- 0
 		 *		- -1
@@ -49,6 +59,9 @@ class TCP_Client{
 
 		/**
 		 * @brief	Closes ongoing TCP connection
+         * 
+         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+         * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -59,6 +72,9 @@ class TCP_Client{
 		/**
 		 * @brief	Sends a packet over TCP connection
 		 * @param	msg	String containing the message
+         * 
+         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+         * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -70,6 +86,9 @@ class TCP_Client{
 		 * @brief	Sends a packet over TCP connection
 		 * @param	msg	Array containing the message
 		 * @param	len	Length of the message
+         * 
+         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+         * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -80,6 +99,9 @@ class TCP_Client{
 		/**
 		 * @brief	Receives one packet
 		 * @param	timeout	Time duration to wait for incoming packet
+         * 
+         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+         * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -90,6 +112,9 @@ class TCP_Client{
 
 		/**
 		 * @brief	Returns packet buffer
+         * 
+         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+         * 
 		 * @return
 		 *		- String
 		 */
@@ -97,6 +122,9 @@ class TCP_Client{
 
 		/**
 		 * @brief	Returns socket descriptor
+         * 
+         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+         * 
 		 * @return
 		 *		- Integer
 		 */

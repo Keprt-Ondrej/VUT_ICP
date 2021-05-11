@@ -26,7 +26,7 @@ public:
      * @brief Construct a new Connect Server object
      * 
      * @param mqtt reference to shared data
-     * @param parent 
+     * @param parent parent window
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
     explicit ConnectServer(MQTT_Client &mqtt, QWidget *parent = nullptr);

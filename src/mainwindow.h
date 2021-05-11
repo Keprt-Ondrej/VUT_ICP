@@ -31,7 +31,7 @@ public:
      * @brief Construct a new Main Window object
      * 
      * @param mqtt shared data
-     * @param parent 
+     * @param parent parent window
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
     explicit MainWindow(MQTT_Client &mqtt, QWidget *parent = 0);
@@ -112,6 +112,7 @@ private slots:
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
     void on_actionDashboard_triggered();
+    void on_actionDisconnect_triggered();
 };
 
 #endif // MAINWINDOW_H

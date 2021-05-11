@@ -29,7 +29,7 @@ public:
      * @brief Construct a new Dash Board object
      * 
      * @param mqtt reference to application data
-     * @param parent 
+     * @param parent parent window
      * @author Keprt Ondřej (xkeprt03@stud.fit.vutbr.cz)
     */
     explicit DashBoard(MQTT_Client &mqtt,QWidget *parent = nullptr);
