@@ -51,9 +51,10 @@ class TCP_Client{
          * 
          * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * @return 
-		 *		- 0
-		 *		- -1
-		 *		- -2
+		 *		- 0		-> OK
+		 *		- -1	-> DNS lookup failed
+		 *		- -3	-> Socket opening failed
+		 *		- -4	-> TCP server connect failed
 		 */
 		int tcp_connect(const std::string& hostname, int port);
 
@@ -63,9 +64,9 @@ class TCP_Client{
          * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
          * 
 		 * @return
-		 *		- 0
-		 *		- -1
-		 *		- -2
+		 *		- 0		-> OK
+		 *		- -1	-> TCP shutdown failed
+		 *		- -2	-> Socket closing failed
 		 */
 		int tcp_disconnect();
 
@@ -76,9 +77,9 @@ class TCP_Client{
          * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
          * 
 		 * @return
-		 *		- 0
-		 *		- -1
-		 *		- -2
+		 *		- 0		-> OK
+		 *		- -1	-> Bad arguments or TCP server not connected
+		 *		- -2	-> TCP packet sending failed
 		 */
 		int tcp_send(const std::string& msg);
 		
@@ -90,9 +91,9 @@ class TCP_Client{
          * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
          * 
 		 * @return
-		 *		- 0
-		 *		- -1
-		 *		- -2
+		 *		- 0		-> OK
+		 *		- -1	-> Bad arguments or TCP server not connected
+		 *		- -2	-> TCP packet sending failed
 		 */
 		int tcp_send(const char* msg, int len);
 
@@ -103,10 +104,10 @@ class TCP_Client{
          * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
          * 
 		 * @return
-		 *		- 0
-		 *		- -1
-		 *		- -2
-		 *		- -3
+		 *		- 0		-> OK
+		 *		- -1	-> Socket data wait (syscall select) error
+		 *		- -2	-> Incoming packet timeout
+		 *		- -3	-> Set nonblocking read error
 		 */
 		int tcp_receive(int timeout);
 
