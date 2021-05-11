@@ -371,5 +371,6 @@ class MQTT_Client : private TCP_Client{
 		QStandardItemModel* tree_root; ///< Pointer to shown tree model
 		std::vector<std::tuple<PacketType, uint16_t>> pending_ack; ///< Queue of pairs containting packet type and packet ID
 		std::vector<uint16_t> unavailable_packet_id;               ///< List of packet IDs in use
+		std::vector<std::string> published_queue;                  ///< Block updating topics in published queue
 };
 #endif // MQTT_CLIENT_H

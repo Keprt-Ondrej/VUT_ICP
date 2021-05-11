@@ -63,7 +63,7 @@ void NewAndEditTopic::on_publish_released()
         retainOnServer      //bool retain;  Store on server store
     };
 
-    update_tree(path, fileMemblock,false);  
+    mqtt.update_tree(path, fileMemblock, false);  
       
     int result = mqtt.publish(path, fileMemblock, flags);
     if(result == 0){ 

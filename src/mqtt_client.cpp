@@ -21,7 +21,6 @@
  * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
  *
  */
-
 #define INSERT_REM_LEN(len, packet)            \
 	while(len != 0){                           \
 		packet += static_cast<char>(len&0xFF); \
@@ -30,6 +29,9 @@
 #define INSERT_2B_LEN(len, packet)              \
 	packet += static_cast<char>((len>>8)&0xFF); \
 	packet += static_cast<char>(len&0xFF); 
+
+#define COLOR_RECEIVED	QColor(180,0,0)
+#define COLOR_PUBLISHED	QColor(0,180,0)
 
 MQTT_Client::MQTT_Client()
 : connected(false), tree_root(NULL){}
@@ -171,6 +173,9 @@ int MQTT_Client::publish(const std::string& topic, const std::string& value, pub
 	/// Expect publish acknowledgement to arrive
 	if(opt.QoS == 1)      add_ack(std::make_tuple(PUBACK, packet_id));
 	else if(opt.QoS == 2) add_ack(std::make_tuple(PUBREC, packet_id));
+
+	/// Expect this packet to arrive
+	published_queue.push_back(topic);
 
 	return 0;
 }
@@ -386,7 +391,8 @@ void continuous_receive(MQTT_Client& client){
 			last_ping = time(0);
 		}
 		else if(retval){
-			std::cerr << "Some error occured: " << retval << std::endl;
+			if(retval == -5) std::cout << "Broker disconnected\n";
+			else             std::cerr << "Some error occured: " << retval << std::endl;
 			break;
 		}
 	}
@@ -628,27 +634,31 @@ data_type_t data_type(const std::string& data){
 
 /**
  * @brief	Recursive helper function that updates an element or inserts a new one
- * @param	item	Element of traversed tree model
- * @param	name	Path to topic element
- * @param	value	Topic data
- * @param	depth	Current depth of traversed branch
+ * @param	item		Element of traversed tree model
+ * @param	name		Path to topic element
+ * @param	value		Topic data
+ * @param	depth		Current depth of traversed branch
+ * @param	received	Flag to signalize if the topic was received or published
  * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
  * @return
  *		- 0
  *		- -1
  */
-int update_topic(QStandardItem* item, const std::string& name, const std::string value, int depth){
+int update_topic(QStandardItem* item, const std::string& name, const std::string value, int depth, bool received){
 	if(item == NULL || depth < 0) return -1;
 	usleep(5);
 	std::pair<std::string,std::string> path = getPath(name);
 	static std::string full_path = "";
 	full_path += item->data(0).toString().toStdString() + "/";
 	if(item->data(0).toString().toStdString() == path.first){
+		if(received) item->setForeground(QBrush(COLOR_RECEIVED));
+		else		 item->setForeground(QBrush(COLOR_PUBLISHED));
+
 		if(item->hasChildren()){
 			int retval = -1;
 			depth--;
 			for(int i = 0; i < item->rowCount(); i++){
-				retval = update_topic(item->child(i), path.second, value, depth);
+				retval = update_topic(item->child(i), path.second, value, depth, received);
 				if(retval == 0) return 0;
 			}
 			depth++;
@@ -665,6 +675,8 @@ int update_topic(QStandardItem* item, const std::string& name, const std::string
 					new_level->setData(QString::fromStdString(full_path), 7);
   					item->appendRow(new_level);
   					item = new_level;
+					if(received) item->setForeground(QBrush(COLOR_RECEIVED));
+					else		 item->setForeground(QBrush(COLOR_PUBLISHED));
 				}
 				QList<QVariant> my_list;
 				QList<QVariant> my_list_types;
@@ -685,7 +697,6 @@ int update_topic(QStandardItem* item, const std::string& name, const std::string
 				item->setData(my_list_types, 5);
 				item->setData(my_list, 6);
 				item->setData(QString::fromStdString(full_path), 7);
-				item->setForeground(QBrush(QColor(250,0,0)));
 				full_path.clear();
 
 				return 0;
@@ -707,7 +718,8 @@ int update_topic(QStandardItem* item, const std::string& name, const std::string
 
 			item->setData(my_list_types, 5);
 			item->setData(my_list, 6);
-			item->setForeground(QBrush(QColor(250,0,0)));
+			if(received) item->setForeground(QBrush(COLOR_RECEIVED));
+			else		 item->setForeground(QBrush(COLOR_PUBLISHED));
 
 			return 0;
 		}
@@ -738,6 +750,11 @@ void MQTT_Client::update_tree(ustring& packet){
 		topic += packet[t_index+2+i];
 	}
 
+	if(not published_queue.empty() && topic == *published_queue.begin()){
+		published_queue.erase(published_queue.begin());
+		return;
+	}
+
 	//std::cout << topic << std::endl;
 	
 	std::string value = "";
@@ -756,7 +773,7 @@ void MQTT_Client::update_tree(const std::string& topic, const std::string& value
 
 	int retval = -1;
 	for(int i = 0; i < tree_root->rowCount(); i++){
-		retval = update_topic(tree_root->item(i), topic, value, depth);
+		retval = update_topic(tree_root->item(i), topic, value, depth, received);
 		if(retval == 0) break;
 	}
 	if(retval == -1){
@@ -773,6 +790,8 @@ void MQTT_Client::update_tree(const std::string& topic, const std::string& value
 		tree_root->appendRow(item);
 
 		for(int i = 1; i <= depth; i++){
+			if(received) item->setForeground(QBrush(COLOR_RECEIVED));
+			else		 item->setForeground(QBrush(COLOR_PUBLISHED));
 			path = getPath(path.second);
 			if(i == depth)
 				full_path += item->data(0).toString().toStdString();
@@ -804,7 +823,8 @@ void MQTT_Client::update_tree(const std::string& topic, const std::string& value
 		item->setData(my_list_types, 5);
 		item->setData(my_list, 6);
 		item->setData(QString::fromStdString(full_path), 7);
-		item->setForeground(QBrush(QColor(250,0,0)));
+		if(received) item->setForeground(QBrush(COLOR_RECEIVED));
+		else		 item->setForeground(QBrush(COLOR_PUBLISHED));
 	}
 }
 
