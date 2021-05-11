@@ -1011,8 +1011,6 @@ void traffic_simulation(MQTT_Client& client){
 				break;
 		}
 
-		std::cout << topic << std::endl;
-
 		client.publish(topic, value, {0,0,0});
 		client.update_tree(topic, value, false);
 		topic.clear();
