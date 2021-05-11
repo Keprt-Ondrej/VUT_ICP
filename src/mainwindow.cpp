@@ -122,6 +122,16 @@ void MainWindow::on_TopicEdit_released()
     ET.exec();
 }
 
+/*
+ * data position in QStandardItem = :
+ * all data posions are QVariant
+ * data[0] = topic name
+ * data[3] = bool topic/level  topic = true
+ * data[4] = zdroj received = true
+ * data[5] = QList<"data_type_t">
+ * data[6] = QList<QVariant> data
+ * data[7] = fullpath
+*/
 void MainWindow::on_TreeView_doubleClicked(const QModelIndex &index)
 {
     if (index.data(3).toBool())
