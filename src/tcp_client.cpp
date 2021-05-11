@@ -1,3 +1,10 @@
+/**
+ * @file	tcp_client.cpp
+ * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+ *
+ * @brief	Simple general TCP client
+ */
+
 #include "tcp_client.h"
 
 #include <iostream>
@@ -19,7 +26,11 @@ TCP_Client::TCP_Client(const std::string& ip_addr, int port)
 TCP_Client::~TCP_Client(){
 	tcp_disconnect();
 }
+
 int TCP_Client::tcp_connect(const std::string& hostname, int port){
+	if(connected)
+		tcp_disconnect();
+
 	/// Get IP through dns
 	struct	addrinfo* ai_ret;
 
@@ -34,17 +45,21 @@ int TCP_Client::tcp_connect(const std::string& hostname, int port){
 	retval = connect(open_socket, &server_address, sizeof(server_address));
 	freeaddrinfo(ai_ret);
 	if(retval) return -4;
+	connected = true;
 	return 0;
 }
 
 int TCP_Client::tcp_disconnect(){
-	// REWORK properly close tcp connection
+	if(!connected)
+		return 0;
 
 	int retval = shutdown(open_socket, SHUT_WR);
 	if(retval) return -1;
 
 	retval = close(open_socket);
 	if(retval) return -2;
+
+	connected = false;
 
 	return 0;
 }
@@ -54,7 +69,7 @@ int TCP_Client::tcp_send(const std::string& msg){
 }
 
 int TCP_Client::tcp_send(const char* msg, int len){
-	if(msg == NULL || len <= 0 || connected) return -1;
+	if(msg == NULL || len <= 0 || !connected) return -1;
 
 	int retval = send(open_socket, msg, len, MSG_NOSIGNAL);
 	if(retval < 0){

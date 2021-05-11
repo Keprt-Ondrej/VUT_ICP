@@ -41,7 +41,7 @@ void ConnectServer::connectToServer()
     std::string password = passwordQS.toUtf8().constData();
     QString QTopics = ui->subscribeTopic->toPlainText();
     std::string topics = QTopics.toUtf8().constData();
-    std::cout << topics << std::endl;
+    //std::cout << topics << std::endl;
 
     client_t info{
         host,
@@ -59,24 +59,33 @@ void ConnectServer::connectToServer()
         if(result == 0){
             bool success = true;
             result = mqtt.start_receiving();
-            std::cout << "Thread: " << result << std::endl;
             if(result != 0)
             {
                 success = false;
             }
 
-            result = mqtt.subscribe("$SYS/#");
-            std::cout << "SYS subscribe: " << result << std::endl;
-            if(result != 0)
+            int index = 0;
+            for(unsigned int i = 0; i < topics.length(); i++) //subscribe to all given topics 
             {
-                success = false;
+                if(topics[i] == '\n')
+                {
+                    topics[i] = '\0';
+                    result = mqtt.subscribe(&(topics.c_str()[index]));
+                    if(result != 0)
+                    {
+                        success = false;
+                        break;
+                    }
+                    index = i+1;
+                }
             }
-
-            result = mqtt.subscribe("#");
-            std::cout << "Everything subscribe: " << result << std::endl;
-            if(result != 0)
+            if(index < topics.length())
             {
-                success = false;
+                result = mqtt.subscribe(&(topics.c_str()[index]));
+                if(result != 0)
+                {
+                    success = false;
+                }
             }
 
             if(success){
