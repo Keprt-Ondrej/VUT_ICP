@@ -128,6 +128,9 @@
      </item>
      <item>
       <widget class="QLineEdit" name="Port">
+       <property name="text">
+        <string>1883</string>
+       </property>
        <property name="placeholderText">
         <string>1883</string>
        </property>
