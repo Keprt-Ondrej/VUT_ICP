@@ -179,6 +179,8 @@ void MainWindow::on_actionDisconnect_triggered()
 
 void MainWindow::on_actionSimulate_triggered()
 {
-    qInfo() << "HERE";
-    simulate->setText("Hellolo");
+    sharedMqtt.start_stop_simulation();
+    if(sharedMqtt.get_simulation_state())
+        simulate->setText("Stop simulation");
+    else simulate->setText("Start simulation");
 }

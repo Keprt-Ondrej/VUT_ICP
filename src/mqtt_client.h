@@ -51,7 +51,7 @@ enum PacketType{
  */
 typedef struct ClientInfo{
 	std::string hostname;  ///< Server hostname or IP
-	int port;              ///< Server port
+	int port;			  ///< Server port
 	std::string username;  ///< Client username
 	std::string password;  ///< Client password
 	std::string client_id; ///< Client specific session ID
@@ -64,7 +64,7 @@ typedef struct ClientInfo{
  * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
  */
 typedef struct PublishFlags{
-	bool DUP;    ///< Duplicate flag
+	bool DUP;	///< Duplicate flag
 	uint8_t QoS; ///< Quality of Service value
 	bool retain; ///< Server retain flag
 } pubflg_t;
@@ -85,21 +85,21 @@ class MQTT_Client : private TCP_Client{
 	public:
 		/**
 		 * @brief	Class constructor
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 */
 		MQTT_Client();
 		/**
 		 * @brief	Class constructor
 		 * @param	info	Encapsulated client information
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 */
 		MQTT_Client(client_t info);
 		/**
 		 * @brief	Class destructor
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 */
 		~MQTT_Client();
 		
@@ -107,9 +107,9 @@ class MQTT_Client : private TCP_Client{
 		/**
 		 * @brief	Connects to an MQTT broker over TCP communication
 		 * @param	info	Encapsulated client information
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -122,9 +122,9 @@ class MQTT_Client : private TCP_Client{
 
 		/**
 		 * @brief	Closes current session with connected MQTT broker
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -137,9 +137,9 @@ class MQTT_Client : private TCP_Client{
 		 * @param	topic	String containing topic path
 		 * @param	value	String containing topic payload
 		 * @param	opt 	Publish flags
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -151,9 +151,9 @@ class MQTT_Client : private TCP_Client{
 		/**
 		 * @brief	Tells the broker to send over this given topic
 		 * @param	topic	String containing topic path for subscription
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -165,9 +165,9 @@ class MQTT_Client : private TCP_Client{
 		/**
 		 * @brief	Tells the broker to stop sending over this given topic
 		 * @param	topic	String containing topic path to unsubscribe
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -178,9 +178,9 @@ class MQTT_Client : private TCP_Client{
 
 		/**
 		 * @brief	Pings broker to let it know the client is still responding
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -190,9 +190,9 @@ class MQTT_Client : private TCP_Client{
 		/**
 		 * @brief	Receives one MQTT packet
 		 * @param	timeout	Time duration to wait for the packet
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -207,16 +207,16 @@ class MQTT_Client : private TCP_Client{
 		/**
 		 * @brief	Sets a pointer to shown tree structure
 		 * @param	root	Pointer to shown tree model
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 */
 		void set_tree_root(QStandardItemModel* root);
 
 		/**
 		 * @brief	Returns connection state
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- false
 		 *		- true
@@ -224,11 +224,22 @@ class MQTT_Client : private TCP_Client{
 		bool get_connected();
 
 		/**
+		 * @brief	Returns simulation state
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
+		 * @return
+		 *		- false
+		 *		- true
+		 */
+		bool get_simulation_state();
+
+		/**
 		 * @brief	Finds a QModelIndex index in shown tree model
 		 * @param	topic	String containig topic path
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- QModelIndex
 		 */
@@ -236,9 +247,9 @@ class MQTT_Client : private TCP_Client{
 
 		/**
 		 * @brief	Starts a thread that receives every packet
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -247,9 +258,9 @@ class MQTT_Client : private TCP_Client{
 
 		/**
 		 * @brief	Waits and joins a running thread
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -258,32 +269,38 @@ class MQTT_Client : private TCP_Client{
 		
 		/**
 		 * @brief	Updates shown tree model or inserts a new element
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @param	packet	Raw PUBLISH packet
 		 */
 		void update_tree(ustring& packet);
 		
 		/**
 		 * @brief	Updates shown tree model or inserts a new element
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @param	topic		Path to topic element
 		 * @param	value		Topic data
 		 * @param	received	Flag to signalize if the topic was received or published
 		 */
 		void update_tree(const std::string& topic, const std::string& value, bool received);
 
+		/**
+		 * @brief	Starts or stops simulating MQTT traffic
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 */
+		void start_stop_simulation();
+
 	private:
 
 		/**
 		 * @brief	Encodes 4 byte integer to an MQTT protocol length
 		 * @param	rem_len	Integer to encode
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- Encoded length
 		 */
@@ -292,9 +309,9 @@ class MQTT_Client : private TCP_Client{
 		/**
 		 * @brief	Decodes 1 to 4 bytes of encoded MQTT protocol length
 		 * @param	rem_len	Array containing 1 to 4 bytes of encoded MQTT protocol length
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- Decoded length
 		 */
@@ -302,16 +319,16 @@ class MQTT_Client : private TCP_Client{
 
 		/**
 		 * @brief	Creates an unique client ID
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 */
 		void unique_client_id();
 
 		/**
 		 * @brief	Creates and stores an unique ID used for packet identification
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- Integer
 		 */
@@ -320,25 +337,25 @@ class MQTT_Client : private TCP_Client{
 		/**
 		 * @brief	Removes stored integer value
 		 * @param	packet_id	Integer value to remove
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 */
 		void rm_packet_id(uint16_t packet_id);
 
 		/**
 		 * @brief	Adds a pair of expected packets to a queue
 		 * @param	ack	A pair containing a packet type and a packet ID
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 */
 		void add_ack(std::tuple<PacketType, uint16_t> ack);
 
 		/**
 		 * @brief	Removes received packet pair from queue
 		 * @param	ack	A pair containing a packet type and a packet ID
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -348,9 +365,9 @@ class MQTT_Client : private TCP_Client{
 		/**
 		 * @brief	Program logic that decides what to do with the received packet
 		 * @param	received_packet	Received packet from TCP communication
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
-         * 
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
 		 * @return
 		 *		- 0
 		 *		- -1
@@ -360,17 +377,26 @@ class MQTT_Client : private TCP_Client{
 		/**
 		 * @brief	Recursively removes and frees all elements from shown three model
 		 * @param	item	Pointer to tree model elements
-         * 
-         * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 * 
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 */
 		void delete_tree(QStandardItem* item);
 
-		client_t client;               ///< Encapsulated client information
-		bool connected;                ///< Flag that holds connection state
+		/**
+		 * @brief	Stops simulating MQTT traffic
+		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+		 */
+		void stop_simulation();
+
+
+		client_t client;			   ///< Encapsulated client information
+		bool connected;				   ///< Flag that holds connection state
+		bool simulate;				   ///< Flag that holds simlation state
 		std::thread receiving_thread;  ///< Thread that receives all incoming packets
+		std::thread simulation_thread; ///< Thread that simulates MQTT traffic
 		QStandardItemModel* tree_root; ///< Pointer to shown tree model
 		std::vector<std::tuple<PacketType, uint16_t>> pending_ack; ///< Queue of pairs containting packet type and packet ID
-		std::vector<uint16_t> unavailable_packet_id;               ///< List of packet IDs in use
-		std::vector<std::string> published_queue;                  ///< Block updating topics in published queue
+		std::vector<uint16_t> unavailable_packet_id;			   ///< List of packet IDs in use
+		std::vector<std::string> published_queue;				  ///< Block updating topics in published queue
 };
 #endif // MQTT_CLIENT_H

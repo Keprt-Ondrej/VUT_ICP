@@ -133,8 +133,8 @@ int MQTT_Client::broker_disconnect(){
 		}
 	}
 
+	stop_simulation();
 	stop_receiving();
-
 	return 0;
 }
 
@@ -309,6 +309,10 @@ void MQTT_Client::set_tree_root(QStandardItemModel* root){
 
 bool MQTT_Client::get_connected(){
 	return connected;
+}
+
+bool MQTT_Client::get_simulation_state(){
+	return simulate;
 }
 
 /**
@@ -849,5 +853,39 @@ void MQTT_Client::delete_tree(QStandardItem* item){
 			delete item;
 			return;
 		}
+	}
+}
+
+/**
+ * @brief	Mainloop of simulating thread
+ * @param	client	Reference to an MQTT client
+ * 
+ * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+ */
+void traffic_simulation(MQTT_Client& client){
+	std::cout << "Started simulation \n";
+	while(client.get_simulation_state() && client.get_connected()){
+		std::cout << "Simulating\n";
+		usleep(1000000);
+	}
+}
+
+void MQTT_Client::start_stop_simulation(){
+	if(simulation_thread.joinable()){
+		std::cout << "Stopping simulation\n";
+		if(simulate) simulate = false;
+		simulation_thread.join();
+	}
+	else{
+		std::cout << "Initializing simulation\n";
+		if(simulate == false) simulate = true;
+		simulation_thread = std::thread(traffic_simulation, std::ref(*this));
+	}
+}
+
+void MQTT_Client::stop_simulation(){
+	simulate = false;
+	if(simulation_thread.joinable()){
+		simulation_thread.join();
 	}
 }

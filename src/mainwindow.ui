@@ -135,7 +135,7 @@
   </action>
   <action name="actionSimulate">
    <property name="text">
-    <string>Simulate</string>
+    <string>Start simulation</string>
    </property>
   </action>
  </widget>
