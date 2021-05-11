@@ -13,12 +13,12 @@ Spustitelný soubor se jmenuje mqttexp
 
 Implementace:
 
-Program nebere zadny argumenty a neuklada/nenacte zadny soubory (krome souboru, ktere se posilaji brokeru)
+Program nebere žádné argumenty a neukládá žádné soubory.
 
-MQTT Klient je delan rucne a kdyz je prilis mnoho prichozich paketu, tak spadne (napriklad kdyz se odoberaji vsechny topicy na testovacich servrech)(kdyz se ale spusti pres valgrind, pak nepada)
+MQTT Klient je udělán ručně a když je příliš mnoho příchozích paketů, tak spadne (například když se odobírají všechny topicy na testovacích servrech)(když se ale spustí přes valgrind, pak nepadá)
 
-Simulator je zakomponovany do normalniho klienta a jenom posila spravy s vynimkou obrazku (obrazky ale lze posilat)
+Simulátor je zakomponovaný do normálního klienta a jenom posíla zprávy s výjimkou obrázků (obrázky ale lze posílat)
 
-Dashboard se nam nepodaril automaticky obnovovat, tak se musi rucne obnovit tlacidlem update.
+Dashboard se nám nepodařil automaticky obnovovat, tak se musí ručně obnovit tlačítkem update.
 
-Vse ostatni by melo jit podle zadani.
+Vše ostatní by mělo jít podle zadání.
