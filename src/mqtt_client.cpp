@@ -10,6 +10,9 @@
 #include <unistd.h> // getpid, fcntl
 #include <fcntl.h>  // fcntl
 #include <iostream>
+#include <random>
+#include <chrono>
+#include <sstream>
 
 /**
  * @def 	INSERT_REM_LEN
@@ -527,7 +530,6 @@ int MQTT_Client::received_data(ustring& received_packet){
 
 		case PUBLISH:
 			std::cout << "PUBLISH arrived.\n";
-			//print_packet(received_packet);
 			qos = (received_packet[0]&0b0110) >> 1;
 			update_tree(received_packet);
 			if(qos != 0){
@@ -650,7 +652,7 @@ data_type_t data_type(const std::string& data){
  */
 int update_topic(QStandardItem* item, const std::string& name, const std::string value, int depth, bool received){
 	if(item == NULL || depth < 0) return -1;
-	usleep(5);
+	//usleep(10);
 	std::pair<std::string,std::string> path = getPath(name);
 	static std::string full_path = "";
 	full_path += item->data(0).toString().toStdString() + "/";
@@ -664,6 +666,7 @@ int update_topic(QStandardItem* item, const std::string& name, const std::string
 			for(int i = 0; i < item->rowCount(); i++){
 				retval = update_topic(item->child(i), path.second, value, depth, received);
 				if(retval == 0) return 0;
+				else if(retval == -10) return -10;
 			}
 			depth++;
 			if(retval == -1){
@@ -674,6 +677,10 @@ int update_topic(QStandardItem* item, const std::string& name, const std::string
 					else
 						full_path += item->data(0).toString().toStdString() + "/";
 					QStandardItem* new_level = new QStandardItem(path.first.c_str());
+					if(new_level == NULL){
+						std::cerr << "Topic allocation failed\n";
+						return -10;
+					}
 					new_level->setData(false, 3);
 					new_level->setData(true, 4);
 					new_level->setData(QString::fromStdString(full_path), 7);
@@ -779,11 +786,18 @@ void MQTT_Client::update_tree(const std::string& topic, const std::string& value
 	for(int i = 0; i < tree_root->rowCount(); i++){
 		retval = update_topic(tree_root->item(i), topic, value, depth, received);
 		if(retval == 0) break;
+		else if(retval == -10){
+			return;
+		}
 	}
 	if(retval == -1){
 		std::pair<std::string,std::string> path = getPath(topic);
 		std::string full_path = "";
 		QStandardItem* item = new QStandardItem(path.first.c_str());
+		if(item == NULL){
+			std::cerr << "Allocation failed\n";
+			return;
+		}
 		if(depth == 0)
 			full_path += item->data(0).toString().toStdString();
 		else
@@ -802,6 +816,10 @@ void MQTT_Client::update_tree(const std::string& topic, const std::string& value
 			else
 				full_path += item->data(0).toString().toStdString() + "/";
 			QStandardItem* new_level = new QStandardItem(path.first.c_str());
+			if(new_level == NULL){
+				std::cerr << "Allocation failed\n";
+				return;
+			}
 			new_level->setData(false, 3);
 			new_level->setData(true, 4);
 			new_level->setData(QString::fromStdString(full_path), 7);
@@ -857,27 +875,158 @@ void MQTT_Client::delete_tree(QStandardItem* item){
 }
 
 /**
+ * @brief	Conversion from integer to string
+ * @param	value	Integer value to convert
+ * 
+ * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
+ * @return
+ *		- Converted string
+ */
+std::string itostr(int value){
+	std::stringstream converted;
+	std::string tmp;
+	converted << value;
+	converted >> tmp;
+	return tmp;
+}
+
+/**
  * @brief	Mainloop of simulating thread
  * @param	client	Reference to an MQTT client
  * 
  * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
  */
 void traffic_simulation(MQTT_Client& client){
-	std::cout << "Started simulation \n";
+	/// Set random time generator between 0.5 and 2 seconds
+    std::mt19937_64 sleep_time(std::random_device{}());
+    std::uniform_int_distribution<> time{200, 2000};
+
+    /// Set random number generator for topic generation
+    std::mt19937_64 topic_generator(std::random_device{}());
+    std::uniform_int_distribution<> topic_path{0, 4};
+    std::uniform_int_distribution<> topic_name{0, 11};
+    std::uniform_int_distribution<> topic_depth{0, 4};
+    std::uniform_int_distribution<> id{0, 20};
+    std::uniform_int_distribution<> choice{0, 1};
+    std::uniform_int_distribution<> digits{0, 3};
+    std::uniform_int_distribution<> to_100{0, 100};
+    std::uniform_int_distribution<> to_10k{0, 10000};
+    std::uniform_int_distribution<> to_4{0, 4};
+    std::uniform_int_distribution<> to_99{0, 99};
+    std::uniform_int_distribution<> coords{-90, 90};
+    std::uniform_int_distribution<> coords_dec{0, 999999};
+    std::uniform_int_distribution<> angle{0, 359};
+
+    std::string topic = "";
+    std::string value = "";
+
 	while(client.get_simulation_state() && client.get_connected()){
-		std::cout << "Simulating\n";
-		usleep(1000000);
+		/// Generate topic path
+		int depth = topic_depth(topic_generator);
+		for(int i = 0; i < depth; i++){
+			switch(topic_path(topic_generator)){
+				case 0: topic += "simulated/"; break;
+				case 1: topic += "device/"; break;
+				case 2: topic += "sensor/"; break;
+				case 3: topic += "data/"; break;
+				case 4: topic += "control/"; break;
+				default: topic += "test/"; break;
+			}
+		}
+
+		/// Generate topic name and value
+		switch(topic_name(topic_generator)){
+			case 0:
+				topic += "door sensor " + itostr(id(topic_generator));
+				if(choice(topic_generator))
+					value = "Door opened";
+				else value = "Door closed";
+				break;
+			case 1:
+				topic += "thermal sensor " + itostr(id(topic_generator));
+				value = itostr(to_100(topic_generator));
+				value += "°C";
+				break;
+			case 2:
+				topic += "wattmeter " + itostr(id(topic_generator));
+				value = itostr(to_10k(topic_generator));
+				value += "W";
+				break;
+			case 3:
+				topic += "motor " + itostr(id(topic_generator));
+				value = itostr(to_10k(topic_generator));
+				value += "RPM";
+				break;
+			case 4:
+				topic += "electric valve " + itostr(id(topic_generator));
+				value = "Opened " + itostr(to_100(topic_generator)) + "%";
+				break;
+			case 5:
+				topic += "humidity sensor " + itostr(id(topic_generator));
+				value = itostr(to_100(topic_generator)) + "%";
+				break;
+			case 6:
+				topic += "cpu " + itostr(id(topic_generator));
+				value = "{\"Clock_speed\":" + itostr(to_4(topic_generator)) + "." + itostr(to_99(topic_generator)) + ",";
+				value += "\"Temperature\":" + itostr(to_100(topic_generator)) + ",";
+				value += "\"CPU_Usage\":" + itostr(to_100(topic_generator)) + "}";
+				break;
+			case 7:
+				topic += "thermostat " + itostr(id(topic_generator));
+				value = itostr(to_100(topic_generator));
+				value += "°C";
+				break;
+			case 8:
+				topic += "power relay " + itostr(id(topic_generator));
+				if(choice(topic_generator))
+					value = "Relay switched on";
+				else value = "Relay switched off";
+				break;
+			case 9:
+				topic += "gps " + itostr(id(topic_generator));
+				value = "{\"lat\": "+ itostr(coords(topic_generator)) + "." + itostr(coords_dec(topic_generator))+",";
+				value += "\"long\": "+ itostr(coords(topic_generator)) + "." + itostr(coords_dec(topic_generator))+"}";
+				break;
+			case 10:
+				topic += "pressure sensor " + itostr(id(topic_generator));
+				value = itostr(to_10k(topic_generator));
+				break;
+			case 11:
+				topic += "stepper motor " + itostr(id(topic_generator));
+				value = "{\"angle\": " + itostr(angle(topic_generator)) + ",";
+				value += "\"step\": ";
+				if(choice(topic_generator)){
+					if(choice(topic_generator))
+						value += "\"full\"";
+					else value += "\"half\"";
+				}
+				else value += "\"quarter\"";
+				value += "}";
+				break;
+			default:
+				topic += "test";
+				value = "Simulated value ";
+				value += itostr(id(topic_generator));
+				break;
+		}
+
+		std::cout << topic << std::endl;
+
+		client.publish(topic, value, {0,0,0});
+		client.update_tree(topic, value, false);
+		topic.clear();
+		value.clear();
+
+    	std::this_thread::sleep_for(std::chrono::milliseconds{time(sleep_time)});
 	}
 }
 
 void MQTT_Client::start_stop_simulation(){
 	if(simulation_thread.joinable()){
-		std::cout << "Stopping simulation\n";
 		if(simulate) simulate = false;
 		simulation_thread.join();
 	}
 	else{
-		std::cout << "Initializing simulation\n";
 		if(simulate == false) simulate = true;
 		simulation_thread = std::thread(traffic_simulation, std::ref(*this));
 	}
