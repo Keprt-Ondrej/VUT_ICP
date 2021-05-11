@@ -63,6 +63,8 @@ void NewAndEditTopic::on_publish_released()
         retainOnServer      //bool retain;  Store on server store
     };
 
+    update_tree(path, fileMemblock,false);  
+      
     int result = mqtt.publish(path, fileMemblock, flags);
     if(result == 0){ 
         QMessageBox messageBox;
