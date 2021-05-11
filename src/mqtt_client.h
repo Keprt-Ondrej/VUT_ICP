@@ -272,6 +272,7 @@ class MQTT_Client : private TCP_Client{
 		 * @author	Matus Fabo (xfabom01@stud.fit.vutbr.cz)
 		 * 
 		 * @param	packet	Raw PUBLISH packet
+		 * @bug		If there is too much traffic, the program crashes
 		 */
 		void update_tree(ustring& packet);
 		
@@ -283,6 +284,7 @@ class MQTT_Client : private TCP_Client{
 		 * @param	topic		Path to topic element
 		 * @param	value		Topic data
 		 * @param	received	Flag to signalize if the topic was received or published
+		 * @bug		If there is too much traffic, the program crashes
 		 */
 		void update_tree(const std::string& topic, const std::string& value, bool received);
 
