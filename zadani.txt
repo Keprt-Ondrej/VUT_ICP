@@ -1,0 +1,34 @@
+ICP projekt - varianta 1: MQTT explorer/dashboard
+
+    MQTT explorer
+        Seznamte se s protokolem MQTT, a dostupnými klientskými knihovnami (viz http://mqtt.org, https://mqtt.org/software/, nebo příslušná kapitola
+        v http://perchta.fit.vutbr.cz:8000/vyuka-sin/62). Doporučuje se knihovna Eclipse Paho. Pro testování použijte opensource broker mosquitto,
+        lokálně nainstalovaný, nebo veřejný (https://test.mosquitto.org/).
+        Vytvořte aplikaci, která se připojí k serveru (MQTT brokeru) a sleduje všechny nebo vybrané zprávy (podle tzv. tématu, neboli topicu).
+        Aplikace si bude průběžně tvořit hierarchickou strukturu témat a ke každému tématu si bude pamatovat historii publikovaných dat. Historie bude 
+        omezena parametrem - počet zpráv k jednomu předmětu.
+        Aplikace bude zobrazovat hierarchii témat a poslední publikovanou zprávu ke každému z nich. Hierarchická struktura (strom) by měla být zobrazována
+        s možností sbalit a rozbalit libovolnou substrukturu (podstrom). Inspirace: Levá část okna mqtt exploreru dostupného na http://mqtt-explorer.com/.
+        Uvažujte jednoduché zprávy typu string (i když reprezentují např. číselnou hodnotu), případně strukturované zprávy ve formátu JSON, případně binární
+        zprávy (typicky obrázky). Každou rozpoznanou variantu (kromě binárních zpráv) zobrazte, v případě rozsáhlých struktur a dlouhých textů zobrazte část
+        a umožněte uživateli zobrazit zbytek (např. v jiném okně apod.). V případě binárních dat se pokuste rozpoznat, zda jde o obrázek a ten umožněte 
+        zobrazitv jiném okně.
+        Ke každému zobrazenému tématu aplikace umožní téma zjemnit (vytvořit nové téma). Ke každému tématu aplikace umožní publikovat zprávu, kterou uživatel
+        specifikuje textem, případně i výběrem ze souboru (např. obrázek).
+        Témata odeslaných zpráv by měla být vizuálně (např barevně) odlišena od zpráv přijatých.
+        Aplikace umožní uložit snímek aktuálního stavu na zadané místo do adresářové struktury - adresářová struktura od zadaného kořene vytvoří adresářový
+        strom odpovídající hierarchii témat MQTT a v souboru "payload.txt" boudou data; v případě obrázků uložte "payload.jpg" apod.
+
+    Dashboard
+        Umožněte uživateli vytvořit (např. v dalším okně/tabu) jednoduchý dashboard (řídicí panel), který aktuální data k několika vybraným tématům zobrazí
+        formou vhodných uživatelsky pojmenovaných widgetů. Uvažujte zobrazení teploty, vlhkosti apod., ale také víceřádkového textu.
+        Umožněte i zadávat data (nastavovat setpointy teploty a vlhkosti, požadované stavy relé apod.) prostřednictvím vhodných widgetů. Umožněte i vkládat
+        libovolný text (představte si, že tímto způsobem realizujete jednoduchý chat k danému předmětu). Ohledně widgetů pro senzorická data a setpointy se
+        Inspirujte se např. u Domoticz (https://www.domoticz.com/).
+        Konfiguraci dashboardu udržujte v konfiguračním souboru aplikace.
+
+    Simulátor MQTT provozu
+        Pro testování a demonstraci vytvořte jednoduchý simulátor MQTT provozu jako speciálního MQTT klienta. Simulujte senzorovovou síť s teploměry, vlhkoměry,
+        wattmetry, pohybovými čidly (PIR, radar, dveřní spínač) apod. a aktuátory typu relé nebo ventil (on-off) a termostat (setpoint), které jsou schopny kromě
+        akceptování příkazů také hlásit aktuální stav. Uvažujte i dohledové kamery, publikující obrázky ve vhodném formátu. Simulátor by měl být konfigurovatelný
+        konfiguračním souborem ve vhodném formátu (jaká data se mají publikovat s jakou periodou apod.).
